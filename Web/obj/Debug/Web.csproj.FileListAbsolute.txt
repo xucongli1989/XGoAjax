@@ -4,3 +4,8 @@ E:\GitHub\XGoAjax\Web\bin\Web.pdb
 E:\GitHub\XGoAjax\Web\obj\Debug\Web.csprojResolveAssemblyReference.cache
 E:\GitHub\XGoAjax\Web\obj\Debug\Web.dll
 E:\GitHub\XGoAjax\Web\obj\Debug\Web.pdb
+D:\MyData\MyGit\GitHub\XGoAjax\Web\bin\Web.dll.config
+D:\MyData\MyGit\GitHub\XGoAjax\Web\bin\Web.dll
+D:\MyData\MyGit\GitHub\XGoAjax\Web\bin\Web.pdb
+D:\MyData\MyGit\GitHub\XGoAjax\Web\obj\Debug\Web.dll
+D:\MyData\MyGit\GitHub\XGoAjax\Web\obj\Debug\Web.pdb
