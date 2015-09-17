@@ -6,16 +6,16 @@
     var defaultTemplate = {
         name: "",//模板名
         before: null,//请求前
-        after: null,//请求后
         error: null,//失败后
         success: null,//成功后
         complete: null,//完成后
-        isMustWaitComplete: true//所有请求结束后能才再发起新的请求
+        templateOption: {}//模板自定义选项
     };
 
     //插件默认选项
     var defaults = {
         templateName: "default",//模板名
+        templateOption: {},//模板自定义选项
         ajaxOption:{
             url: "",
             dataType: "JSON",
@@ -30,25 +30,20 @@
     $.extend({
         XGoAjax: function (ops) {
             ops = $.extend({}, defaults, ops || {});
-            
+            var tp = _templates[ops.templateName];//当前模板
             ops.ajaxOption.url = (ops.ajaxOption.url ? ops.ajaxOption.url : $form.attr("action")) || win.location.href;
             ops.ajaxOption.data = ops.ajaxOption.data ? ops.ajaxOption.data : $form.serialize();
             ops.ajaxOption.type = (ops.ajaxOption.type ? ops.ajaxOption.type : $form.attr("method")) || "POST";
+            ops.templateOption = $.extend({}, ops.templateOption, tp.templateOption);
 
-            var tp = _templates[ops.templateName];//当前模板
+            tp.before.call(this,ops);
 
-            tp.before.call(this);
-
-            var def = $.deferred();
-
-            def.when($.ajax(ops.ajaxOption)).pipe(function () {
-
-            }).done(function () {
-                tp.success.apply(this, arguments);
+            $.when($.ajax(ops.ajaxOption)).done(function () {
+                tp.success.call(this, ops);
             }).always(function () {
-                tp.complete.apply(this, arguments);
+                tp.complete.call(this, ops);
             }).fail(function () {
-                tp.error.apply(this, arguments);
+                tp.error.call(this, ops);
             });
 
         }
@@ -56,6 +51,8 @@
 
     //添加自定义模板
     $.XGoAjax.addTemplate = function (model) {
-        _templates[model.name] = $.extend({}, defaultTemplate, model);
+        if (model.name) {
+            _templates[model.name] = $.extend({}, defaultTemplate, model);
+        }
     };
 })(window, document);

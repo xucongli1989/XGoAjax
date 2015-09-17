@@ -1,0 +1,6 @@
+E:\GitHub\XGoAjax\Web\bin\Web.dll.config
+E:\GitHub\XGoAjax\Web\bin\Web.dll
+E:\GitHub\XGoAjax\Web\bin\Web.pdb
+E:\GitHub\XGoAjax\Web\obj\Debug\Web.csprojResolveAssemblyReference.cache
+E:\GitHub\XGoAjax\Web\obj\Debug\Web.dll
+E:\GitHub\XGoAjax\Web\obj\Debug\Web.pdb

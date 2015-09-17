@@ -1,20 +1,24 @@
 //Ä¬ÈÏÄ£°å
 $.XGoAjax.addTemplate({
     name: "default",
-    before: function () {
+    before: function (ops) {
         console.log("before");
+        debugger;
     },
-    after: function () {
+    after: function (ops) {
         console.log("after");
     },
-    error: function () {
+    error: function (ops) {
         console.log("error");
     },
-    success: function () {
+    success: function (ops) {
         console.log("success");
     },
-    complete: function () {
+    complete: function (ops) {
         console.log("complete");
     },
-    isMustWaitComplete: true
+    templateOption: {
+        isRedirect: false,
+        redirectUrl:""
+    }
 });
