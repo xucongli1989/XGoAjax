@@ -5,8 +5,11 @@
     <script type="text/javascript" src="XGoAjax.js"></script>
 </head>
 <body>
-    <input type="button" id="btnSave" value="限制提交（当前必须只有一个请求）" />
-    <input type="button" id="btnSave2" value="不限制提交（可以发出多个请求）" />
+    <input type="button" id="btnSave" value="限制提交（当前必须只有一个请求，独占模式）" />
+    <br/><br />
+    <input type="button" id="btnSave2" value="不限制提交（可以发出多个请求，贪婪模式）" />
+    <br /><br />
+    <input type="button" id="btnSave3" value="同时发送多个ajax请求（当前必须只有一组请求，独占模式）" />
     <script type="text/javascript">
         $(function () {
 
@@ -14,7 +17,6 @@
                 $.XGoAjax({
                     id:"saveAjax",
                     ajax: [{
-                        type:"get",
                         url:"data.aspx"
                     }]
                 });
@@ -25,7 +27,19 @@
                     id: "saveAjax2",
                     mode:"greedy",
                     ajax: [{
+                        url: "data.aspx"
+                    }]
+                });
+            });
+
+            $("#btnSave3").on("click", function () {
+                $.XGoAjax({
+                    id: "saveAjax3",
+                    ajax: [{
                         type: "get",
+                        url: "data.aspx"
+                    }, {
+                        type: "post",
                         url: "data.aspx"
                     }]
                 });

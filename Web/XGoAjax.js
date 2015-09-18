@@ -20,7 +20,7 @@
 
     /*插件默认选项*/
     var defaults = {
-        id:"",
+        id: "",
         //模板名
         templateName: "default",
         //模板自定义选项
@@ -47,7 +47,7 @@
     };
     var _getWorkById = function (id) {
         var result = null;
-        $.each(_workList, function (i,n) {
+        $.each(_workList, function (i, n) {
             if (($.trim(id)).toUpperCase() === n.id.toUpperCase()) {
                 result = n;
                 return false;
@@ -70,14 +70,16 @@
             var dfd = null, isAllowRun = true;
             var tp = _templates[ops.templateName];//当前模板
 
-            $.each(ops.ajax, function (i,n) {
-                n.url = (n.url ? n.url : $form.attr("action")) || win.location.href;
-                n.data = n.data ? n.data : $form.serialize();
-                n.type = (n.type ? n.type : $form.attr("method")) || "POST";
+            var action = $form.attr("action"), data = $form.serialize(), method = $form.attr("method");
+
+            $.each(ops.ajax, function (i, n) {
+                n.url = (n.url ? n.url : action) || win.location.href;
+                n.data = n.data ? n.data : data;
+                n.type = (n.type ? n.type : method) || "POST";
             });
 
             ops.templateOption = $.extend({}, ops.templateOption, tp.templateOption);
-            
+
             if (!tp.before.call(this, ops)) {
                 //只有当before返回true时，才执行请求
                 isAllowRun = false;
@@ -91,14 +93,11 @@
             }
 
             if (isAllowRun) {
-                var ajaxArr = [];
-                $.each(ops.ajax, function (i,n) {
-                    ajaxArr.push(function () {
-                        return $.ajax(n);
-                    });
+                var ajaxDeferred = [];
+                $.each(ops.ajax, function (i, n) {
+                    ajaxDeferred.push($.ajax(n));
                 });
-                dfd = $.when.apply($, ajaxArr);
-                dfd.done(function (data) {
+                dfd = $.when.apply($, ajaxDeferred).done(function (data) {
                     if (data && !(data instanceof Object)) {
                         data = $.parseJSON(data);
                     }
@@ -131,10 +130,7 @@
     $.XGoAjax.getAjaxList = function () {
         return _workList;
     };
-
 })(window, document);
-
-
 
 /*默认模板，如果需要自定义模板，参照下面的模板方法即可！*/
 $.XGoAjax.addTemplate({
