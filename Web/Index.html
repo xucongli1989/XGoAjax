@@ -10,7 +10,8 @@
         $(function () {
             $("#btnSave").on("click", function () {
                 $.XGoAjax({
-                    ajaxOption: {
+                    ajax: {
+                        type:"get",
                         url:"data.json"
                     }
                 });
