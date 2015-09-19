@@ -13,7 +13,7 @@ namespace Web
         {
             System.Threading.Thread.Sleep(3000);
             Response.Clear();
-            Response.Write(@"{ ""IsSuccess"": true,""Message"": ""保存成功！""}");
+            Response.Write(@"{ ""IsSuccess"": true,""Message"": ""保存成功（"+Guid.NewGuid().ToString("N")+@"）！""}");
             Response.End();
         }
     }

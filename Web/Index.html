@@ -1,31 +1,76 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+    <link href="plugin/artDialog/skins/blue.css" rel="stylesheet" />
+    <script src="plugin/artDialog/artDialog.js"></script>
+    <script src="plugin/artDialog/plugins/iframeTools.js"></script>
     <script type="text/javascript" src="XGoAjax.js"></script>
+    <style>
+        .title {
+            color:#f00;
+            font-weight:bolder;
+            font-size:16px;
+        }
+    </style>
+
+    <script>
+        (function (config) {
+            config['lock'] = true;
+            config['opacity'] = 0.2;
+            config['resize'] = true;
+        })(art.dialog.defaults);
+    </script>
+
 </head>
 <body>
-    <input type="button" id="btnSave" value="é™åˆ¶æäº¤ï¼ˆå½“å‰å¿…é¡»åªæœ‰ä¸€ä¸ªè¯·æ±‚ï¼Œç‹¬å æ¨¡å¼ï¼‰" />
-    <br/><br />
-    <input type="button" id="btnSave2" value="ä¸é™åˆ¶æäº¤ï¼ˆå¯ä»¥å‘å‡ºå¤šä¸ªè¯·æ±‚ï¼Œè´ªå©ªæ¨¡å¼ï¼‰" />
-    <br /><br />
-    <input type="button" id="btnSave3" value="åŒæ—¶å‘é€å¤šä¸ªajaxè¯·æ±‚ï¼ˆå½“å‰å¿…é¡»åªæœ‰ä¸€ç»„è¯·æ±‚ï¼Œç‹¬å æ¨¡å¼ï¼‰" />
+
+    <fieldset>
+        <legend class="title">Ä¬ÈÏÄ£°å£º</legend>
+        <div>
+            <input type="button" id="btnSave1" value="Ã¿´Îµ¥»÷·¢³öÒ»¸öajaxÇëÇó£¨µ±Ç°±ØÐëÖ»ÓÐÒ»¸öÇëÇó£¬¶ÀÕ¼Ä£Ê½£©" />
+            <br /><br />
+            <input type="button" id="btnSave2" value="Ã¿´Îµ¥»÷·¢³öÒ»¸öajaxÇëÇó£¨¿ÉÒÔ·¢³ö¶à¸öÇëÇó£¬Ì°À·Ä£Ê½£©" />
+            <br /><br />
+            <input type="button" id="btnSave3" value="Ã¿´Îµ¥»÷·¢³ö¶à¸öajaxÇëÇó£¨µ±Ç°±ØÐëÖ»ÓÐÒ»×éÇëÇó£¬¶ÀÕ¼Ä£Ê½£©" />
+            <br /><br />
+            <input type="button" id="btnSave4" value="Ã¿´Îµ¥»÷·¢³ö¶à¸öajaxÇëÇó£¨¿ÉÒÔ·¢³ö¶à×éÇëÇó£¬Ì°À·Ä£Ê½£©" />
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend class="title">artDialogÄ£°å£º</legend>
+        <div>
+            <input type="button" id="btnSaveArtdialog1" value="Ã¿´Îµ¥»÷·¢³öÒ»¸öajaxÇëÇó£¨µ±Ç°±ØÐëÖ»ÓÐÒ»¸öÇëÇó£¬¶ÀÕ¼Ä£Ê½£©" />
+            <br /><br />
+            <input type="button" id="btnSaveArtdialog2" value="Ã¿´Îµ¥»÷·¢³öÒ»¸öajaxÇëÇó£¨¿ÉÒÔ·¢³ö¶à¸öÇëÇó£¬Ì°À·Ä£Ê½£©" />
+            <br /><br />
+            <input type="button" id="btnSaveArtdialog3" value="Ã¿´Îµ¥»÷·¢³ö¶à¸öajaxÇëÇó£¨µ±Ç°±ØÐëÖ»ÓÐÒ»×éÇëÇó£¬¶ÀÕ¼Ä£Ê½£©" />
+            <br /><br />
+            <input type="button" id="btnSaveArtdialog4" value="Ã¿´Îµ¥»÷·¢³ö¶à¸öajaxÇëÇó£¨¿ÉÒÔ·¢³ö¶à×éÇëÇó£¬Ì°À·Ä£Ê½£©" />
+        </div>
+    </fieldset>
+
+
+
     <script type="text/javascript">
         $(function () {
 
-            $("#btnSave").on("click", function () {
+            /**************Ä¬ÈÏÄ£°å£º*******************/
+
+            $("#btnSave1").on("click", function () {
                 $.XGoAjax({
-                    id:"saveAjax",
+                    id: "btnSave1",
                     ajax: [{
-                        url:"data.aspx"
+                        url: "data.aspx"
                     }]
                 });
             });
 
             $("#btnSave2").on("click", function () {
                 $.XGoAjax({
-                    id: "saveAjax2",
-                    mode:"greedy",
+                    id: "btnSave2",
+                    mode: "greedy",
                     ajax: [{
                         url: "data.aspx"
                     }]
@@ -34,7 +79,74 @@
 
             $("#btnSave3").on("click", function () {
                 $.XGoAjax({
-                    id: "saveAjax3",
+                    id: "btnSave3",
+                    ajax: [{
+                        type: "get",
+                        url: "data.aspx"
+                    }, {
+                        type: "post",
+                        url: "data.aspx"
+                    }]
+                });
+            });
+
+            $("#btnSave4").on("click", function () {
+                $.XGoAjax({
+                    id: "btnSave4",
+                    mode: "greedy",
+                    ajax: [{
+                        type: "get",
+                        url: "data.aspx"
+                    }, {
+                        type: "post",
+                        url: "data.aspx"
+                    }]
+                });
+            });
+
+
+            /**************artdialogÄ£°å£º*******************/
+            
+            $("#btnSaveArtdialog1").on("click", function () {
+                $.XGoAjax({
+                    templateName: "artdialog",
+                    id: "btnSaveArtdialog1",
+                    ajax: [{
+                        url: "data.aspx"
+                    }]
+                });
+            });
+
+            $("#btnSaveArtdialog2").on("click", function () {
+                $.XGoAjax({
+                    templateName: "artdialog",
+                    id: "btnSaveArtdialog2",
+                    mode: "greedy",
+                    ajax: [{
+                        url: "data.aspx"
+                    }]
+                });
+            });
+
+            $("#btnSaveArtdialog3").on("click", function () {
+                $.XGoAjax({
+                    templateName: "artdialog",
+                    id: "btnSaveArtdialog3",
+                    ajax: [{
+                        type: "get",
+                        url: "data.aspx"
+                    }, {
+                        type: "post",
+                        url: "data.aspx"
+                    }]
+                });
+            });
+
+            $("#btnSaveArtdialog4").on("click", function () {
+                $.XGoAjax({
+                    templateName: "artdialog",
+                    id: "btnSaveArtdialog4",
+                    mode: "greedy",
                     ajax: [{
                         type: "get",
                         url: "data.aspx"

@@ -20,11 +20,11 @@
         //模板名
         name: "",
         //请求前，如果返回false，则阻止后续执行。
-        before: function () { return true; },
+        before: function (ops) { return true; },
         //失败后
         error: null,
-        //成功后
-        success: null,
+        //成功后，data为数组
+        success: function (ops, datas) { },
         //完成后
         complete: null,
         //模板自定义选项
@@ -41,12 +41,15 @@
         //请求模式，exclusive：独占请求，要想再发起同样的一个请求，必须等待上次请求结束。；greedy：贪婪请求，不限制重复请求
         mode: "exclusive",
         //$.ajax选项，数组的每一项代表一个ajax请求，可以有多个ajax请求
-        ajax: [{
-            url: "",
-            dataType: "JSON",
-            type: "",
-            data: null
-        }]
+        ajax: []
+    };
+
+    /*$.ajax的默认选项*/
+    var ajaxDefaults = {
+        url: "",
+        dataType: "JSON",
+        type: "get",
+        data:null
     };
 
     /*ajax请求列表*/
@@ -89,14 +92,11 @@
                 n.url = (n.url ? n.url : action) || win.location.href;
                 n.data = n.data ? n.data : data;
                 n.type = (n.type ? n.type : method) || "POST";
+                ops.ajax[i]=$.extend({},ajaxDefaults,n);
             });
 
             ops.templateOption = $.extend({}, ops.templateOption, tp.templateOption);
 
-            if (!tp.before.call(this, ops)) {
-                //只有当before返回true时，才执行请求
-                isAllowRun = false;
-            }
             if (ops.mode === "exclusive") {
                 //独占只能允许一个请求正在执行
                 var item = _getWorkById(ops.id);
@@ -105,16 +105,26 @@
                 }
             }
 
-            if (isAllowRun) {
+            if (isAllowRun && tp.before.call(this, ops)) {
+                //只有当before返回true时，才执行请求
                 var ajaxDeferred = [];
                 $.each(ops.ajax, function (i, n) {
                     ajaxDeferred.push($.ajax(n));
                 });
-                dfd = $.when.apply($, ajaxDeferred).done(function (data) {
-                    if (data && !(data instanceof Object)) {
-                        data = $.parseJSON(data);
+                dfd = $.when.apply($, ajaxDeferred).done(function () {
+                    var datas = [], args = arguments,d=null;
+
+                    for (var i = 0; i < ops.ajax.length; i++) {
+                        d = ops.ajax.length > 1 ? args[i][0] : args[0];
+                        if (ops.ajax[i].dataType.toUpperCase() === "JSON" && !(d instanceof Object)) {
+                            //如果请求类型为json，但是返回的不是一个对象，则将返回值转为json
+                            datas.push($.parseJSON(d));
+                        } else {
+                            datas.push(d);
+                        }
                     }
-                    tp.success.call(this, ops, data);
+
+                    tp.success.call(this, ops, datas);
                 }).always(function () {
                     _removeById(ops.id);
                     tp.complete.call(this, ops);
@@ -129,7 +139,7 @@
                 return dfd ? dfd.state() : null;
             };
 
-            return dfd ? dfd.promise() : dfd;
+            return dfd ? dfd.promise() : null;
         }
     });
 
@@ -145,25 +155,72 @@
     };
 })(window, document);
 
-/*默认模板，如果需要自定义模板，参照下面的模板方法即可！*/
+
+/*
+*****************************************************************
+* 以下为模板，可根据您的项目需要，自行添加相应的模板方法即可。
+*****************************************************************
+*/
+
+
+/*默认模板*/
 $.XGoAjax.addTemplate({
     name: "default",
     before: function (ops) {
+        console.log("正在执行中，请稍后...");
         return true;
     },
     error: function (ops) {
-        console.log("error");
+        console.log("请求失败！");
     },
-    success: function (ops, data) {
-        console.log("success:" + ops.getState());
+    success: function (ops, datas) {
+        var msg = "";
+        $.each(datas, function (i, n) {
+            msg += n.Message;
+        });
+        console.log(msg);
     },
     complete: function (ops) {
-        console.log("complete:" + ops.getState());
+        console.log("请求已完成！");
+    }
+});
+
+
+/*artdialog模板*/
+$.XGoAjax.addTemplate({
+    name: "artdialog",
+    before: function (ops) {
+        art.dialog.tips(ops.templateOption.beforeSendMsg,99999999999);
+        return true;
+    },
+    error: function (ops) {
+        art.dialog({
+            icon: "error",
+            content: "抱歉，出错了！",
+            ok: function () { }
+        });
+    },
+    success: function (ops, datas) {
+        var msg = "";
+        $.each(datas, function (i,n) {
+            msg += n.Message;
+        });
+        art.dialog({
+            icon: "succeed",
+            content: msg,
+            ok: function () {
+
+            }
+        });
+    },
+    complete: function (ops) {
+        var list = art.dialog.list["Tips"];
+        if (null != list) {
+            list.close();
+        }
     },
     templateOption: {
         //请求前要提示的信息
-        beforeSendMsg: "正在处理中，请稍后...",
-        //true:以alert的方式弹出消息，点确定或关闭执行刷新或其它函数。false:以tips弹出消息
-        isAlertShowMsg: false
+        beforeSendMsg: "正在处理中，请稍后..."
     }
 });

@@ -51,6 +51,34 @@
   <ItemGroup>
     <Content Include="Index.html" />
     <Content Include="jquery-1.11.3.min.js" />
+    <Content Include="plugin\artDialog\artDialog.js" />
+    <Content Include="plugin\artDialog\artDialog.source.js" />
+    <Content Include="plugin\artDialog\plugins\iframeTools.js" />
+    <Content Include="plugin\artDialog\plugins\iframeTools.source.js" />
+    <Content Include="plugin\artDialog\skins\blue.css" />
+    <Content Include="plugin\artDialog\skins\blue\bg.png" />
+    <Content Include="plugin\artDialog\skins\blue\bg2.png" />
+    <Content Include="plugin\artDialog\skins\blue\bg_css3.png" />
+    <Content Include="plugin\artDialog\skins\blue\bg_css3_2.png" />
+    <Content Include="plugin\artDialog\skins\blue\ie6\close.hover.png" />
+    <Content Include="plugin\artDialog\skins\blue\ie6\close.png" />
+    <Content Include="plugin\artDialog\skins\blue\ie6\e.png" />
+    <Content Include="plugin\artDialog\skins\blue\ie6\n.png" />
+    <Content Include="plugin\artDialog\skins\blue\ie6\ne.png" />
+    <Content Include="plugin\artDialog\skins\blue\ie6\nw.png" />
+    <Content Include="plugin\artDialog\skins\blue\ie6\s.png" />
+    <Content Include="plugin\artDialog\skins\blue\ie6\se.png" />
+    <Content Include="plugin\artDialog\skins\blue\ie6\sw.png" />
+    <Content Include="plugin\artDialog\skins\blue\ie6\w.png" />
+    <Content Include="plugin\artDialog\skins\default.css" />
+    <Content Include="plugin\artDialog\skins\icons\error.png" />
+    <Content Include="plugin\artDialog\skins\icons\face-sad.png" />
+    <Content Include="plugin\artDialog\skins\icons\face-smile.png" />
+    <Content Include="plugin\artDialog\skins\icons\loading.gif" />
+    <Content Include="plugin\artDialog\skins\icons\question.png" />
+    <Content Include="plugin\artDialog\skins\icons\succeed.png" />
+    <Content Include="plugin\artDialog\skins\icons\warning.png" />
+    <Content Include="plugin\artDialog\skins\simple.css" />
     <Content Include="Web.config" />
     <Content Include="XGoAjax.js" />
   </ItemGroup>
