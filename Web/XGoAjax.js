@@ -22,11 +22,11 @@
         //请求前，如果返回false，则阻止后续执行。
         before: function (ops) { return true; },
         //失败后
-        error: null,
+        error: function (ops) { },
         //成功后，data为数组
         success: function (ops, datas) { },
         //完成后
-        complete: null,
+        complete: function (ops) { },
         //模板自定义选项
         templateOption: {}
     };
@@ -91,7 +91,7 @@
             $.each(ops.ajax, function (i, n) {
                 n.url = (n.url ? n.url : action) || win.location.href;
                 n.data = n.data ? n.data : data;
-                n.type = (n.type ? n.type : method) || "POST";
+                n.type = (n.type ? n.type : method) || "get";
                 ops.ajax[i]=$.extend({},ajaxDefaults,n);
             });
 
