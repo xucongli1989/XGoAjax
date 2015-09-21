@@ -37,7 +37,15 @@
         id: "",
         //模板名
         templateName: "default",
-        //模板自定义选项
+        //请求前function，如果未指定，则执行模板中的before函数
+        before: null,
+        //失败后function，如果未指定，则执行模板中的error函数
+        error: null,
+        //成功后function，如果未指定，则执行模板中的success函数
+        success: null,
+        //完成后function，如果未指定，则执行模板中的complete函数
+        complete: null,
+        //模板自定义选项，此属性完全由用户在不同的模板中根据需要自定义
         templateOption: {},
         //请求模式，exclusive：独占请求，要想再发起同样的一个请求，必须等待上次请求结束。；greedy：贪婪请求，不限制重复请求
         mode: "exclusive",
@@ -50,7 +58,7 @@
         url: "",
         dataType: "JSON",
         type: "get",
-        data:null
+        data: null
     };
 
     /*ajax请求列表*/
@@ -93,7 +101,7 @@
                 n.url = (n.url ? n.url : action) || win.location.href;
                 n.data = n.data ? n.data : data;
                 n.type = (n.type ? n.type : method) || "get";
-                ops.ajax[i]=$.extend({},ajaxDefaults,n);
+                ops.ajax[i] = $.extend({}, ajaxDefaults, n);
             });
 
             ops.templateOption = $.extend({}, ops.templateOption, tp.templateOption);
@@ -106,14 +114,24 @@
                 }
             }
 
-            if (isAllowRun && tp.before.call(this, ops)) {
+            var beforeResult = false;
+
+            if (isAllowRun) {
+                if (ops.before) {
+                    beforeResult = ops.before.call(this, ops);
+                } else {
+                    beforeResult = tp.before.call(this, ops);
+                }
+            }
+
+            if (isAllowRun && beforeResult) {
                 //只有当before返回true时，才执行请求
                 var ajaxDeferred = [];
                 $.each(ops.ajax, function (i, n) {
                     ajaxDeferred.push($.ajax(n));
                 });
                 dfd = $.when.apply($, ajaxDeferred).done(function () {
-                    var datas = [], args = arguments,d=null;
+                    var datas = [], args = arguments, d = null;
 
                     for (var i = 0; i < ops.ajax.length; i++) {
                         d = ops.ajax.length > 1 ? args[i][0] : args[0];
@@ -125,12 +143,25 @@
                         }
                     }
 
-                    tp.success.call(this, ops, datas);
+                    if (ops.success) {
+                        ops.success.call(this, ops, datas);
+                    } else {
+                        tp.success.call(this, ops, datas);
+                    }
                 }).always(function () {
                     _removeById(ops.id);
-                    tp.complete.call(this, ops);
+
+                    if (ops.complete) {
+                        ops.complete.call(this, ops);
+                    } else {
+                        tp.complete.call(this, ops);
+                    }
                 }).fail(function () {
-                    tp.error.call(this, ops);
+                    if (ops.error) {
+                        ops.error.call(this, ops);
+                    } else {
+                        tp.error.call(this, ops);
+                    }
                 });
                 _addWork(new workItemModel(ops.id, dfd.promise()));
             }
@@ -156,13 +187,11 @@
     };
 })(window, document);
 
-
 /*
 ***************************************************************************************************************************************************************************************************
 * 以下为模板，可根据您的项目需要，自行添加相应的模板方法即可。
 ***************************************************************************************************************************************************************************************************
 */
-
 
 /*默认模板*/
 $.XGoAjax.addTemplate({
@@ -195,15 +224,11 @@ $.XGoAjax.addTemplate({
     }
 });
 
-
-
-
-
 /*artdialog模板*/
 $.XGoAjax.addTemplate({
     name: "artdialog",
     before: function (ops) {
-        art.dialog.tips(ops.templateOption.beforeSendMsg,99999999999);
+        art.dialog.tips(ops.templateOption.beforeSendMsg, 99999999999);
         return true;
     },
     error: function (ops) {
@@ -232,14 +257,6 @@ $.XGoAjax.addTemplate({
         }
         */
 
-        if (ops.templateOption.successFunction) {
-            ops.templateOption.successFunction.apply(this, arguments);
-            if (ops.templateOption.afterSuccessFunction) {
-                ops.templateOption.afterSuccessFunction.apply(this, arguments);
-            }
-            return;
-        }
-
         var data = datas[0];
         //artdialog图标
         var dialogIcon = "succeed";
@@ -261,9 +278,13 @@ $.XGoAjax.addTemplate({
             ops.templateOption.isAlertShowMsg = true;
             dialogIcon = "error";
         }
-        
+
         if (data.Message != "") {
             if (ops.templateOption.isAlertShowMsg) {
+                var list = art.dialog.list["Tips"];
+                if (null != list) {
+                    list.close();
+                }
                 art.dialog({
                     icon: dialogIcon,
                     content: "<div style='max-width:500px;'>" + data.Message + "</div>",
@@ -278,26 +299,13 @@ $.XGoAjax.addTemplate({
                 refresh();
             }
         }
-
-        if (ops.templateOption.afterSuccessFunction) {
-            ops.templateOption.afterSuccessFunction.apply(this, arguments);
-            return;
-        }
-
     },
     complete: function (ops) {
-        var list = art.dialog.list["Tips"];
-        if (null != list) {
-            list.close();
-        }
+
     },
     templateOption: {
         //请求前要提示的信息
         beforeSendMsg: "正在处理中，请稍后...",
-        //请求成功后执行的函数，此方法会覆盖模板中的success方法
-        successFunction: null,
-        //执行默认的成功函数后要执行的内容
-        afterSuccessFunction: null,
         //true:以alert的方式弹出消息，点确定或关闭执行刷新或其它函数。false:以tips弹出消息
         isAlertShowMsg: false,
         //刷新函数
