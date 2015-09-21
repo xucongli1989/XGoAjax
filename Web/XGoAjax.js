@@ -27,12 +27,13 @@
         success: function (ops, datas) { },
         //完成后
         complete: function (ops) { },
-        //模板自定义选项
+        //模板自定义选项，此属性完全由用户在不同的模板中根据需要自定义
         templateOption: {}
     };
 
     /*插件默认选项*/
     var defaults = {
+        //发起请求的标识，可以随意指定，主要是便于判断该请求为同一类型的操作。比如，一个按钮来触发一个或一组ajax请求，就可以通过指定的id来判断这个按钮上一次触发的请求是否已执行完毕
         id: "",
         //模板名
         templateName: "default",
@@ -157,9 +158,9 @@
 
 
 /*
-*****************************************************************
+***************************************************************************************************************************************************************************************************
 * 以下为模板，可根据您的项目需要，自行添加相应的模板方法即可。
-*****************************************************************
+***************************************************************************************************************************************************************************************************
 */
 
 
@@ -174,6 +175,15 @@ $.XGoAjax.addTemplate({
         console.log("请求失败！");
     },
     success: function (ops, datas) {
+        /*
+        请求成功后返回的data格式：
+        data={
+            //提示语
+            Message:"",
+            //更多
+            ...
+        }
+        */
         var msg = "";
         $.each(datas, function (i, n) {
             msg += n.Message;
@@ -186,6 +196,9 @@ $.XGoAjax.addTemplate({
 });
 
 
+
+
+
 /*artdialog模板*/
 $.XGoAjax.addTemplate({
     name: "artdialog",
@@ -194,24 +207,83 @@ $.XGoAjax.addTemplate({
         return true;
     },
     error: function (ops) {
-        art.dialog({
-            icon: "error",
-            content: "抱歉，出错了！",
-            ok: function () { }
-        });
+        art.dialog.tips("抱歉，请求出错啦！");
     },
     success: function (ops, datas) {
-        var msg = "";
-        $.each(datas, function (i,n) {
-            msg += n.Message;
-        });
-        art.dialog({
-            icon: "succeed",
-            content: msg,
-            ok: function () {
+        /*
+        请求成功后返回的data格式：
+        data={
+            //提示标题
+            Title:"",
+            //提示语
+            Message:"",
+            //是否成功
+            IsSuccess:false,
+            //是否进行刷新
+            IsRefresh:false,
+            //是否需要跳转
+            IsRedirect:false,
+            //要跳转的url
+            RedirectURL:"",
+            //自定义输出对象
+            CustomObject:null,
+            //更多
+            ...
+        }
+        */
 
+        if (ops.templateOption.successFunction) {
+            ops.templateOption.successFunction.apply(this, arguments);
+            if (ops.templateOption.afterSuccessFunction) {
+                ops.templateOption.afterSuccessFunction.apply(this, arguments);
             }
-        });
+            return;
+        }
+
+        var data = datas[0];
+        //artdialog图标
+        var dialogIcon = "succeed";
+        //定义刷新函数
+        var refresh = function () {
+            var time = 700;
+            if (ops.templateOption.isAlertShowMsg) {
+                time = 0;
+            }
+            if (data.IsRefresh) {
+                setTimeout(function () {
+                    ops.templateOption.refreshFunction.apply(this, arguments);
+                }, time);
+            }
+        };
+
+        //如果失败且有提示语，则以alert方式弹出消息
+        if (data && data.Message && !data.IsSuccess) {
+            ops.templateOption.isAlertShowMsg = true;
+            dialogIcon = "error";
+        }
+        
+        if (data.Message != "") {
+            if (ops.templateOption.isAlertShowMsg) {
+                art.dialog({
+                    icon: dialogIcon,
+                    content: "<div style='max-width:500px;'>" + data.Message + "</div>",
+                    cancelVal: '知道了',
+                    cancel: function () {
+                        refresh();
+                    }
+                });
+            } else {
+                //以tips方式显示消息
+                art.dialog.tips(data.Message);
+                refresh();
+            }
+        }
+
+        if (ops.templateOption.afterSuccessFunction) {
+            ops.templateOption.afterSuccessFunction.apply(this, arguments);
+            return;
+        }
+
     },
     complete: function (ops) {
         var list = art.dialog.list["Tips"];
@@ -221,6 +293,16 @@ $.XGoAjax.addTemplate({
     },
     templateOption: {
         //请求前要提示的信息
-        beforeSendMsg: "正在处理中，请稍后..."
+        beforeSendMsg: "正在处理中，请稍后...",
+        //请求成功后执行的函数，此方法会覆盖模板中的success方法
+        successFunction: null,
+        //执行默认的成功函数后要执行的内容
+        afterSuccessFunction: null,
+        //true:以alert的方式弹出消息，点确定或关闭执行刷新或其它函数。false:以tips弹出消息
+        isAlertShowMsg: false,
+        //刷新函数
+        refreshFunction: function () {
+            art.dialog.open.origin.location.reload();
+        }
     }
 });
