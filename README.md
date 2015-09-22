@@ -21,6 +21,27 @@
 指定结果消息处理所使用的模板
 </td>
 </tr>
+
+<tr>
+<td>before</td>
+<td>null</td>
+<td>请求前function，如果未指定，则执行模板中的before函数</td>
+</tr>
+<tr>
+<td>error</td>
+<td>null</td>
+<td>失败后function，如果未指定，则执行模板中的error函数</td>
+</tr>
+<tr>
+<td>success</td>
+<td>null</td>
+<td>成功后function，如果未指定，则执行模板中的success函数</td>
+</tr>
+<tr>
+<td>complete</td>
+<td>null</td>
+<td>完成后function，如果未指定，则执行模板中的complete函数</td>
+</tr>
 <tr>
 <td>templateOption</td>
 <td>{}</td>
@@ -140,7 +161,7 @@ ops:当前插件选项
 </tr>
 <tr>
 <td>$.XGoAjax.getAjaxList()</td>
-<td>获取当前正在处理的ajax列表</td>
+<td>获取当前正在处理的ajax对象</td>
 </tr>
 </table>
 
