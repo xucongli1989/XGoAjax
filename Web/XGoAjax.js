@@ -62,28 +62,15 @@
     };
 
     /*ajax请求列表*/
-    var _workList = [];
-    var workItemModel = function (id, promise) {
-        this.id = id;
-        this.promise = promise;
-    };
-    var _addWork = function (item) {
-        _workList.push(item);
+    var _workList = {};
+    var _addWork = function (id, defer) {
+        _workList[id] = defer;
     };
     var _getWorkById = function (id) {
-        var result = null;
-        $.each(_workList, function (i, n) {
-            if (($.trim(id)).toUpperCase() === n.id.toUpperCase()) {
-                result = n;
-                return false;
-            }
-        });
-        return result;
+        return _workList[id] || null;
     };
     var _removeById = function (id) {
-        _workList = $.map(_workList, function (n) {
-            return ($.trim(id)).toUpperCase() === id.toUpperCase() ? null : n;
-        });
+        delete _workList[id];
     };
 
     var $form = $("form:first");
@@ -109,7 +96,7 @@
             if (ops.mode === "exclusive") {
                 //独占只能允许一个请求正在执行
                 var item = _getWorkById(ops.id);
-                if (item && item.promise && item.promise.state() === "pending") {
+                if (item && item.state() === "pending") {
                     isAllowRun = false;
                 }
             }
@@ -163,7 +150,7 @@
                         tp.error.call(this, ops);
                     }
                 });
-                _addWork(new workItemModel(ops.id, dfd.promise()));
+                _addWork(ops.id, dfd);
             }
 
             //返回当前请求状态
@@ -171,7 +158,7 @@
                 return dfd ? dfd.state() : null;
             };
 
-            return dfd ? dfd.promise() : null;
+            return dfd ? dfd : null;
         }
     });
 
@@ -307,7 +294,7 @@ $.XGoAjax.addTemplate({
         //请求前要提示的信息
         beforeSendMsg: "正在处理中，请稍后...",
         //true:以alert的方式弹出消息，点确定或关闭执行刷新或其它函数。false:以tips弹出消息
-        isAlertShowMsg: false,
+        isAlertShowMsg: true,
         //刷新函数
         refreshFunction: function () {
             art.dialog.open.origin.location.reload();
