@@ -12,6 +12,11 @@
  * 更新时间：2015-09-18
  */
 ; (function (win, doc, undefined) {
+    "use strict";
+    
+    //全局设置
+    var _globalSettings = {};
+
     //当前插件所有模板存放的区
     var _templates = {};
 
@@ -35,8 +40,8 @@
     var defaults = {
         //发起请求的标识，可以随意指定，主要是便于判断该请求为同一类型的操作。比如，一个按钮来触发一个或一组ajax请求，就可以通过指定的id来判断这个按钮上一次触发的请求是否已执行完毕
         id: "",
-        //模板名
-        templateName: "default",
+        //模板名，默认值在_globalSettings中设置
+        templateName: "",
         //请求前function，如果未指定，则执行模板中的before函数
         before: null,
         //失败后function，如果未指定，则执行模板中的error函数
@@ -47,8 +52,8 @@
         complete: null,
         //模板自定义选项，此属性完全由用户在不同的模板中根据需要自定义
         templateOption: {},
-        //请求模式，exclusive：独占请求，要想再发起同样的一个请求，必须等待上次请求结束。；greedy：贪婪请求，不限制重复请求
-        mode: "exclusive",
+        //请求模式，exclusive：独占请求，要想再发起同样的一个请求，必须等待上次请求结束。；greedy：贪婪请求，不限制重复请求。默认值在_globalSettings中设置
+        mode: "",
         //$.ajax选项，数组的每一项代表一个ajax请求，可以有多个ajax请求
         ajax: []
     };
@@ -169,9 +174,34 @@
         }
     };
 
+    /*获取当前的ajax列表对象*/
     $.XGoAjax.getAjaxList = function () {
         return _workList;
     };
+
+    /*根据模板名获取模板对象*/
+    $.XGoAjax.getTemplate = function (name) {
+        return _templates[name] || null;
+    };
+
+    /*本插件全局设置*/
+    $.XGoAjax.globalSettings = function (setting) {
+        _globalSettings = $.extend({
+            //默认模板名
+            templateName: "default",
+            //默认请求模式
+            mode: "exclusive"
+        }, setting || {});
+        defaults.templateName = _globalSettings.templateName;
+        defaults.mode = _globalSettings.mode;
+    };
+    $.XGoAjax.globalSettings();
+
+    /*获取本插件全局设置*/
+    $.XGoAjax.getGlobalSettings = function () {
+        return _globalSettings || null;
+    };
+
 })(window, document);
 
 /*

@@ -1,6 +1,25 @@
 # XGoAjax简介
 统一对ajax请求的结果进行处理，包括消息提示、错误处理等操作，这样可以保证我们的项目有一个统一的风格，同时也简化了大量的代码。
 #属性
+**插件全局设置：**
+<table>
+<tr>
+<td>属性名</td>
+<td>默认值</td>
+<td>说明</td>
+</tr>
+<tr>
+<td>templateName</td>
+<td>"default"</td>
+<td>默认模板名</td>
+</tr>
+<tr>
+<td>mode</td>
+<td>"exclusive"</td>
+<td>默认请求模式</td>
+</tr>
+</table>
+
 **插件选项：**
 
 <table>
@@ -16,7 +35,7 @@
 </tr>
 <tr>
 <td>templateName</td>
-<td>"default"</td>
+<td>【全局设置】中的templateName属性</td>
 <td>
 指定结果消息处理所使用的模板
 </td>
@@ -51,7 +70,7 @@
 </tr>
 <tr>
 <td>mode</td>
-<td>"exclusive"</td>
+<td>【全局设置】中的mode属性</td>
 <td>
 请求模式，exclusive：独占请求，要想再发起同样的一个请求，必须等待上次请求结束。；greedy：贪婪请求，不限制重复请求
 </td>
@@ -162,6 +181,18 @@ ops:当前插件选项
 <tr>
 <td>$.XGoAjax.getAjaxList()</td>
 <td>获取当前正在处理的ajax对象</td>
+</tr>
+<tr>
+<td>$.XGoAjax.getTemplate(name)</td>
+<td>根据模板名获取模板对象</td>
+</tr>
+<tr>
+<td>$.XGoAjax.globalSettings({...})</td>
+<td>本插件全局设置，可设置templateName、mode...</td>
+</tr>
+<tr>
+<td>$.XGoAjax.getGlobalSettings()</td>
+<td>获取本插件全局设置</td>
 </tr>
 </table>
 
