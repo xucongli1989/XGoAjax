@@ -277,18 +277,6 @@ $.XGoAjax.addTemplate({
         var data = datas[0];
         //artdialog图标
         var dialogIcon = "succeed";
-        //定义刷新函数
-        var refresh = function () {
-            var time = 700;
-            if (ops.templateOption.isAlertShowMsg) {
-                time = 0;
-            }
-            if (data.IsRefresh) {
-                setTimeout(function () {
-                    ops.templateOption.refreshFunction.apply(this, arguments);
-                }, time);
-            }
-        };
 
         //如果失败且有提示语，则以alert方式弹出消息
         if (data && data.Message && !data.IsSuccess) {
@@ -296,12 +284,30 @@ $.XGoAjax.addTemplate({
             dialogIcon = "error";
         }
 
-        if (data.Message != "") {
+        //关闭窗口中正在提示的tips
+        var list = art.dialog.list["Tips"];
+        if (null != list) {
+            list.close();
+        }
+
+        //定义刷新函数
+        var refresh = function () {
+            //跳转
+            if (data.IsRedirect && data.RedirectURL) {
+                location.href = data.RedirectURL;
+                return;
+            }
+            //刷新
+            if (data.IsRefresh) {
+                setTimeout(function () {
+                    ops.templateOption.refreshFunction.apply(this, arguments);
+                }, ops.templateOption.isAlertShowMsg ? 0 : 700);//延迟0.7s的目的是在tips提示的场景下，让用户多看一下提示语
+            }
+        };
+
+        if (data.Message != "" && data.Message != null) {
             if (ops.templateOption.isAlertShowMsg) {
-                var list = art.dialog.list["Tips"];
-                if (null != list) {
-                    list.close();
-                }
+                //以对话框方式显示消息
                 art.dialog({
                     icon: dialogIcon,
                     content: "<div style='max-width:500px;'>" + data.Message + "</div>",
