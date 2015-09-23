@@ -38,7 +38,7 @@
 
     /*插件默认选项*/
     var defaults = {
-        //发起请求的标识，可以随意指定，主要是便于判断该请求为同一类型的操作。比如，一个按钮来触发一个或一组ajax请求，就可以通过指定的id来判断这个按钮上一次触发的请求是否已执行完毕
+        //发起请求的标识，可以随意指定，主要是便于判断该请求为同一类型的操作。比如，一个按钮来触发一个或一组ajax请求，就可以通过指定的id来判断这个按钮上一次触发的请求是否已执行完毕。如果未指定则默认为贪婪模式。
         id: "",
         //模板名，默认值在_globalSettings中设置
         templateName: "",
@@ -69,7 +69,9 @@
     /*ajax请求列表*/
     var _workList = {};
     var _addWork = function (id, defer) {
-        _workList[id] = defer;
+        if (id) {
+            _workList[id] = defer;
+        }
     };
     var _getWorkById = function (id) {
         return _workList[id] || null;
