@@ -324,7 +324,11 @@ $.XGoAjax.addTemplate({
         }
     },
     complete: function (ops) {
-
+        //关闭窗口中正在提示的tips
+        var list = art.dialog.list["Tips"];
+        if (null != list) {
+            list.close();
+        }
     },
     templateOption: {
         //请求前要提示的信息
