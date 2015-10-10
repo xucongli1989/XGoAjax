@@ -162,7 +162,7 @@ ops:当前插件选项
 </tr>
 <tr>
 <td>data</td>
-<td>null</td>
+<td>第一个form序列化值（jquery的serialize()方法）</td>
 <td>发送的数据</td>
 </tr>
 
