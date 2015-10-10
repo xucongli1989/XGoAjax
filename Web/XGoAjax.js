@@ -1,64 +1,64 @@
 /**
  * ******************************************************************************************
- * 1£º»ù±¾ĞÅÏ¢£º
- * ¿ªÔ´Ğ­Òé£ºhttps://github.com/xucongli1989/XGoAjax/blob/master/LICENSE
- * ÏîÄ¿µØÖ·£ºhttps://github.com/xucongli1989/XGoAjax
- * µç×ÓÓÊ¼ş£º80213876@qq.com
+ * 1ï¼šåŸºæœ¬ä¿¡æ¯ï¼š
+ * å¼€æºåè®®ï¼šhttps://github.com/xucongli1989/XGoAjax/blob/master/LICENSE
+ * é¡¹ç›®åœ°å€ï¼šhttps://github.com/xucongli1989/XGoAjax
+ * ç”µå­é‚®ä»¶ï¼š80213876@qq.com
  * Create By: XCL @ 2015.09 in Shenzhen. China
  ********************************************************************************************
- * 2£ºÊ¹ÓÃËµÃ÷£º
- * ËùÓĞµÄajaxÇëÇó±ØĞëÊ¹ÓÃ´Ë·½·¨µ÷ÓÃ£¬ÕâÑù¿ÉÒÔ±£Ö¤ÏîÄ¿ÖĞµÄajaxÍ³Ò»´¦Àí£¬°üÀ¨ÌáÊ¾Óï£¬´íÎó´¦ÀíµÈ¡£ÀàËÆÓÚ¹ÜµÀ¹¦ÄÜ£¬×îÖÕ»¹ÊÇÊ¹ÓÃµÄjquery.ajax¡£
- * µ±Ç°°æ±¾£ºv1.0
- * ¸üĞÂÊ±¼ä£º2015-09-18
+ * 2ï¼šä½¿ç”¨è¯´æ˜ï¼š
+ * æ‰€æœ‰çš„ajaxè¯·æ±‚å¿…é¡»ä½¿ç”¨æ­¤æ–¹æ³•è°ƒç”¨ï¼Œè¿™æ ·å¯ä»¥ä¿è¯é¡¹ç›®ä¸­çš„ajaxç»Ÿä¸€å¤„ç†ï¼ŒåŒ…æ‹¬æç¤ºè¯­ï¼Œé”™è¯¯å¤„ç†ç­‰ã€‚ç±»ä¼¼äºç®¡é“åŠŸèƒ½ï¼Œæœ€ç»ˆè¿˜æ˜¯ä½¿ç”¨çš„jquery.ajaxã€‚
+ * å½“å‰ç‰ˆæœ¬ï¼šv1.0
+ * æ›´æ–°æ—¶é—´ï¼š2015-09-18
  */
 ; (function (win, doc, undefined) {
     "use strict";
     
-    //È«¾ÖÉèÖÃ
+    //å…¨å±€è®¾ç½®
     var _globalSettings = {};
 
-    //µ±Ç°²å¼şËùÓĞÄ£°å´æ·ÅµÄÇø
+    //å½“å‰æ’ä»¶æ‰€æœ‰æ¨¡æ¿å­˜æ”¾çš„åŒº
     var _templates = {};
 
-    /*Ä¬ÈÏÄ£°åÏî*/
+    /*é»˜è®¤æ¨¡æ¿é¡¹*/
     var defaultTemplate = {
-        //Ä£°åÃû
+        //æ¨¡æ¿å
         name: "",
-        //ÇëÇóÇ°£¬Èç¹û·µ»Øfalse£¬Ôò×èÖ¹ºóĞøÖ´ĞĞ¡£
+        //è¯·æ±‚å‰ï¼Œå¦‚æœè¿”å›falseï¼Œåˆ™é˜»æ­¢åç»­æ‰§è¡Œã€‚
         before: function (ops) { return true; },
-        //Ê§°Üºó
+        //å¤±è´¥å
         error: function (ops) { },
-        //³É¹¦ºó£¬dataÎªÊı×é
+        //æˆåŠŸåï¼Œdataä¸ºæ•°ç»„
         success: function (ops, datas) { },
-        //Íê³Éºó
+        //å®Œæˆå
         complete: function (ops) { },
-        //Ä£°å×Ô¶¨ÒåÑ¡Ïî£¬´ËÊôĞÔÍêÈ«ÓÉÓÃ»§ÔÚ²»Í¬µÄÄ£°åÖĞ¸ù¾İĞèÒª×Ô¶¨Òå
+        //æ¨¡æ¿è‡ªå®šä¹‰é€‰é¡¹ï¼Œæ­¤å±æ€§å®Œå…¨ç”±ç”¨æˆ·åœ¨ä¸åŒçš„æ¨¡æ¿ä¸­æ ¹æ®éœ€è¦è‡ªå®šä¹‰
         templateOption: {}
     };
 
-    /*²å¼şÄ¬ÈÏÑ¡Ïî*/
+    /*æ’ä»¶é»˜è®¤é€‰é¡¹*/
     var defaults = {
-        //·¢ÆğÇëÇóµÄ±êÊ¶£¬¿ÉÒÔËæÒâÖ¸¶¨£¬Ö÷ÒªÊÇ±ãÓÚÅĞ¶Ï¸ÃÇëÇóÎªÍ¬Ò»ÀàĞÍµÄ²Ù×÷¡£±ÈÈç£¬Ò»¸ö°´Å¥À´´¥·¢Ò»¸ö»òÒ»×éajaxÇëÇó£¬¾Í¿ÉÒÔÍ¨¹ıÖ¸¶¨µÄidÀ´ÅĞ¶ÏÕâ¸ö°´Å¥ÉÏÒ»´Î´¥·¢µÄÇëÇóÊÇ·ñÒÑÖ´ĞĞÍê±Ï¡£Èç¹ûÎ´Ö¸¶¨ÔòÄ¬ÈÏÎªÌ°À·Ä£Ê½¡£
+        //å‘èµ·è¯·æ±‚çš„æ ‡è¯†ï¼Œå¯ä»¥éšæ„æŒ‡å®šï¼Œä¸»è¦æ˜¯ä¾¿äºåˆ¤æ–­è¯¥è¯·æ±‚ä¸ºåŒä¸€ç±»å‹çš„æ“ä½œã€‚æ¯”å¦‚ï¼Œä¸€ä¸ªæŒ‰é’®æ¥è§¦å‘ä¸€ä¸ªæˆ–ä¸€ç»„ajaxè¯·æ±‚ï¼Œå°±å¯ä»¥é€šè¿‡æŒ‡å®šçš„idæ¥åˆ¤æ–­è¿™ä¸ªæŒ‰é’®ä¸Šä¸€æ¬¡è§¦å‘çš„è¯·æ±‚æ˜¯å¦å·²æ‰§è¡Œå®Œæ¯•ã€‚å¦‚æœæœªæŒ‡å®šåˆ™é»˜è®¤ä¸ºè´ªå©ªæ¨¡å¼ã€‚
         id: "",
-        //Ä£°åÃû£¬Ä¬ÈÏÖµÔÚ_globalSettingsÖĞÉèÖÃ
+        //æ¨¡æ¿åï¼Œé»˜è®¤å€¼åœ¨_globalSettingsä¸­è®¾ç½®
         templateName: "",
-        //ÇëÇóÇ°function£¬Èç¹ûÎ´Ö¸¶¨£¬ÔòÖ´ĞĞÄ£°åÖĞµÄbeforeº¯Êı
+        //è¯·æ±‚å‰functionï¼Œå¦‚æœæœªæŒ‡å®šï¼Œåˆ™æ‰§è¡Œæ¨¡æ¿ä¸­çš„beforeå‡½æ•°
         before: null,
-        //Ê§°Üºófunction£¬Èç¹ûÎ´Ö¸¶¨£¬ÔòÖ´ĞĞÄ£°åÖĞµÄerrorº¯Êı
+        //å¤±è´¥åfunctionï¼Œå¦‚æœæœªæŒ‡å®šï¼Œåˆ™æ‰§è¡Œæ¨¡æ¿ä¸­çš„errorå‡½æ•°
         error: null,
-        //³É¹¦ºófunction£¬Èç¹ûÎ´Ö¸¶¨£¬ÔòÖ´ĞĞÄ£°åÖĞµÄsuccessº¯Êı
+        //æˆåŠŸåfunctionï¼Œå¦‚æœæœªæŒ‡å®šï¼Œåˆ™æ‰§è¡Œæ¨¡æ¿ä¸­çš„successå‡½æ•°
         success: null,
-        //Íê³Éºófunction£¬Èç¹ûÎ´Ö¸¶¨£¬ÔòÖ´ĞĞÄ£°åÖĞµÄcompleteº¯Êı
+        //å®Œæˆåfunctionï¼Œå¦‚æœæœªæŒ‡å®šï¼Œåˆ™æ‰§è¡Œæ¨¡æ¿ä¸­çš„completeå‡½æ•°
         complete: null,
-        //Ä£°å×Ô¶¨ÒåÑ¡Ïî£¬´ËÊôĞÔÍêÈ«ÓÉÓÃ»§ÔÚ²»Í¬µÄÄ£°åÖĞ¸ù¾İĞèÒª×Ô¶¨Òå
+        //æ¨¡æ¿è‡ªå®šä¹‰é€‰é¡¹ï¼Œæ­¤å±æ€§å®Œå…¨ç”±ç”¨æˆ·åœ¨ä¸åŒçš„æ¨¡æ¿ä¸­æ ¹æ®éœ€è¦è‡ªå®šä¹‰
         templateOption: {},
-        //ÇëÇóÄ£Ê½£¬exclusive£º¶ÀÕ¼ÇëÇó£¬ÒªÏëÔÙ·¢ÆğÍ¬ÑùµÄÒ»¸öÇëÇó£¬±ØĞëµÈ´ıÉÏ´ÎÇëÇó½áÊø¡££»greedy£ºÌ°À·ÇëÇó£¬²»ÏŞÖÆÖØ¸´ÇëÇó¡£Ä¬ÈÏÖµÔÚ_globalSettingsÖĞÉèÖÃ
+        //è¯·æ±‚æ¨¡å¼ï¼Œexclusiveï¼šç‹¬å è¯·æ±‚ï¼Œè¦æƒ³å†å‘èµ·åŒæ ·çš„ä¸€ä¸ªè¯·æ±‚ï¼Œå¿…é¡»ç­‰å¾…ä¸Šæ¬¡è¯·æ±‚ç»“æŸã€‚ï¼›greedyï¼šè´ªå©ªè¯·æ±‚ï¼Œä¸é™åˆ¶é‡å¤è¯·æ±‚ã€‚é»˜è®¤å€¼åœ¨_globalSettingsä¸­è®¾ç½®
         mode: "",
-        //$.ajaxÑ¡Ïî£¬Êı×éµÄÃ¿Ò»Ïî´ú±íÒ»¸öajaxÇëÇó£¬¿ÉÒÔÓĞ¶à¸öajaxÇëÇó
+        //$.ajaxé€‰é¡¹ï¼Œæ•°ç»„çš„æ¯ä¸€é¡¹ä»£è¡¨ä¸€ä¸ªajaxè¯·æ±‚ï¼Œå¯ä»¥æœ‰å¤šä¸ªajaxè¯·æ±‚
         ajax: []
     };
 
-    /*$.ajaxµÄÄ¬ÈÏÑ¡Ïî*/
+    /*$.ajaxçš„é»˜è®¤é€‰é¡¹*/
     var ajaxDefaults = {
         url: "",
         dataType: "JSON",
@@ -66,7 +66,7 @@
         data: null
     };
 
-    /*ajaxÇëÇóÁĞ±í*/
+    /*ajaxè¯·æ±‚åˆ—è¡¨*/
     var _workList = {};
     var _addWork = function (id, defer) {
         if (id) {
@@ -80,15 +80,13 @@
         delete _workList[id];
     };
 
-    var $form = $("form:first");
-
-    /*À©Õ¹jquery*/
+    /*æ‰©å±•jquery*/
     $.extend({
         XGoAjax: function (ops) {
             ops = $.extend({}, defaults, ops || {});
             var dfd = null, isAllowRun = true;
-            var tp = _templates[ops.templateName];//µ±Ç°Ä£°å
-
+            var tp = _templates[ops.templateName];//å½“å‰æ¨¡æ¿
+            var $form = $("form:first");
             var action = $form.attr("action"), data = $form.serialize(), method = $form.attr("method");
 
             $.each(ops.ajax, function (i, n) {
@@ -101,7 +99,7 @@
             ops.templateOption = $.extend({}, ops.templateOption, tp.templateOption);
 
             if (ops.mode === "exclusive") {
-                //¶ÀÕ¼Ö»ÄÜÔÊĞíÒ»¸öÇëÇóÕıÔÚÖ´ĞĞ
+                //ç‹¬å åªèƒ½å…è®¸ä¸€ä¸ªè¯·æ±‚æ­£åœ¨æ‰§è¡Œ
                 var item = _getWorkById(ops.id);
                 if (item && item.state() === "pending") {
                     isAllowRun = false;
@@ -119,7 +117,7 @@
             }
 
             if (isAllowRun && beforeResult) {
-                //Ö»ÓĞµ±before·µ»ØtrueÊ±£¬²ÅÖ´ĞĞÇëÇó
+                //åªæœ‰å½“beforeè¿”å›trueæ—¶ï¼Œæ‰æ‰§è¡Œè¯·æ±‚
                 var ajaxDeferred = [];
                 $.each(ops.ajax, function (i, n) {
                     ajaxDeferred.push($.ajax(n));
@@ -130,7 +128,7 @@
                     for (var i = 0; i < ops.ajax.length; i++) {
                         d = ops.ajax.length > 1 ? args[i][0] : args[0];
                         if (ops.ajax[i].dataType.toUpperCase() === "JSON" && !(d instanceof Object)) {
-                            //Èç¹ûÇëÇóÀàĞÍÎªjson£¬µ«ÊÇ·µ»ØµÄ²»ÊÇÒ»¸ö¶ÔÏó£¬Ôò½«·µ»ØÖµ×ªÎªjson
+                            //å¦‚æœè¯·æ±‚ç±»å‹ä¸ºjsonï¼Œä½†æ˜¯è¿”å›çš„ä¸æ˜¯ä¸€ä¸ªå¯¹è±¡ï¼Œåˆ™å°†è¿”å›å€¼è½¬ä¸ºjson
                             datas.push($.parseJSON(d));
                         } else {
                             datas.push(d);
@@ -160,7 +158,7 @@
                 _addWork(ops.id, dfd);
             }
 
-            //·µ»Øµ±Ç°ÇëÇó×´Ì¬
+            //è¿”å›å½“å‰è¯·æ±‚çŠ¶æ€
             ops.getState = function () {
                 return dfd ? dfd.state() : null;
             };
@@ -169,29 +167,29 @@
         }
     });
 
-    /*Ìí¼Ó×Ô¶¨ÒåÄ£°å*/
+    /*æ·»åŠ è‡ªå®šä¹‰æ¨¡æ¿*/
     $.XGoAjax.addTemplate = function (model) {
         if (model.name) {
             _templates[model.name] = $.extend({}, defaultTemplate, model);
         }
     };
 
-    /*»ñÈ¡µ±Ç°µÄajaxÁĞ±í¶ÔÏó*/
+    /*è·å–å½“å‰çš„ajaxåˆ—è¡¨å¯¹è±¡*/
     $.XGoAjax.getAjaxList = function () {
         return _workList;
     };
 
-    /*¸ù¾İÄ£°åÃû»ñÈ¡Ä£°å¶ÔÏó*/
+    /*æ ¹æ®æ¨¡æ¿åè·å–æ¨¡æ¿å¯¹è±¡*/
     $.XGoAjax.getTemplate = function (name) {
         return _templates[name] || null;
     };
 
-    /*±¾²å¼şÈ«¾ÖÉèÖÃ*/
+    /*æœ¬æ’ä»¶å…¨å±€è®¾ç½®*/
     $.XGoAjax.globalSettings = function (setting) {
         _globalSettings = $.extend({
-            //Ä¬ÈÏÄ£°åÃû
+            //é»˜è®¤æ¨¡æ¿å
             templateName: "default",
-            //Ä¬ÈÏÇëÇóÄ£Ê½
+            //é»˜è®¤è¯·æ±‚æ¨¡å¼
             mode: "exclusive"
         }, setting || {});
         defaults.templateName = _globalSettings.templateName;
@@ -199,7 +197,7 @@
     };
     $.XGoAjax.globalSettings();
 
-    /*»ñÈ¡±¾²å¼şÈ«¾ÖÉèÖÃ*/
+    /*è·å–æœ¬æ’ä»¶å…¨å±€è®¾ç½®*/
     $.XGoAjax.getGlobalSettings = function () {
         return _globalSettings || null;
     };
@@ -208,27 +206,27 @@
 
 /*
 ***************************************************************************************************************************************************************************************************
-* ÒÔÏÂÎªÄ£°å£¬¿É¸ù¾İÄúµÄÏîÄ¿ĞèÒª£¬×ÔĞĞÌí¼ÓÏàÓ¦µÄÄ£°å·½·¨¼´¿É¡£
+* ä»¥ä¸‹ä¸ºæ¨¡æ¿ï¼Œå¯æ ¹æ®æ‚¨çš„é¡¹ç›®éœ€è¦ï¼Œè‡ªè¡Œæ·»åŠ ç›¸åº”çš„æ¨¡æ¿æ–¹æ³•å³å¯ã€‚
 ***************************************************************************************************************************************************************************************************
 */
 
-/*Ä¬ÈÏÄ£°å*/
+/*é»˜è®¤æ¨¡æ¿*/
 $.XGoAjax.addTemplate({
     name: "default",
     before: function (ops) {
-        console.log("ÕıÔÚÖ´ĞĞÖĞ£¬ÇëÉÔºó...");
+        console.log("æ­£åœ¨æ‰§è¡Œä¸­ï¼Œè¯·ç¨å...");
         return true;
     },
     error: function (ops) {
-        console.log("ÇëÇóÊ§°Ü£¡");
+        console.log("è¯·æ±‚å¤±è´¥ï¼");
     },
     success: function (ops, datas) {
         /*
-        ÇëÇó³É¹¦ºó·µ»ØµÄdata¸ñÊ½£º
+        è¯·æ±‚æˆåŠŸåè¿”å›çš„dataæ ¼å¼ï¼š
         data={
-            //ÌáÊ¾Óï
+            //æç¤ºè¯­
             Message:"",
-            //¸ü¶à
+            //æ›´å¤š
             ...
         }
         */
@@ -239,11 +237,11 @@ $.XGoAjax.addTemplate({
         console.log(msg);
     },
     complete: function (ops) {
-        console.log("ÇëÇóÒÑÍê³É£¡");
+        console.log("è¯·æ±‚å·²å®Œæˆï¼");
     }
 });
 
-/*artdialogÄ£°å*/
+/*artdialogæ¨¡æ¿*/
 $.XGoAjax.addTemplate({
     name: "artdialog",
     before: function (ops) {
@@ -251,75 +249,75 @@ $.XGoAjax.addTemplate({
         return true;
     },
     error: function (ops) {
-        art.dialog.tips("±§Ç¸£¬ÇëÇó³ö´íÀ²£¡");
+        art.dialog.tips("æŠ±æ­‰ï¼Œè¯·æ±‚å‡ºé”™å•¦ï¼");
     },
     success: function (ops, datas) {
         /*
-        ÇëÇó³É¹¦ºó·µ»ØµÄdata¸ñÊ½£º
+        è¯·æ±‚æˆåŠŸåè¿”å›çš„dataæ ¼å¼ï¼š
         data={
-            //ÌáÊ¾±êÌâ
+            //æç¤ºæ ‡é¢˜
             Title:"",
-            //ÌáÊ¾Óï
+            //æç¤ºè¯­
             Message:"",
-            //ÊÇ·ñ³É¹¦
+            //æ˜¯å¦æˆåŠŸ
             IsSuccess:false,
-            //ÊÇ·ñ½øĞĞË¢ĞÂ
+            //æ˜¯å¦è¿›è¡Œåˆ·æ–°
             IsRefresh:false,
-            //ÊÇ·ñĞèÒªÌø×ª
+            //æ˜¯å¦éœ€è¦è·³è½¬
             IsRedirect:false,
-            //ÒªÌø×ªµÄurl
+            //è¦è·³è½¬çš„url
             RedirectURL:"",
-            //×Ô¶¨ÒåÊä³ö¶ÔÏó
+            //è‡ªå®šä¹‰è¾“å‡ºå¯¹è±¡
             CustomObject:null,
-            //¸ü¶à
+            //æ›´å¤š
             ...
         }
         */
 
         var data = datas[0];
-        //artdialogÍ¼±ê
+        //artdialogå›¾æ ‡
         var dialogIcon = "succeed";
 
-        //Èç¹ûÊ§°ÜÇÒÓĞÌáÊ¾Óï£¬ÔòÒÔalert·½Ê½µ¯³öÏûÏ¢
+        //å¦‚æœå¤±è´¥ä¸”æœ‰æç¤ºè¯­ï¼Œåˆ™ä»¥alertæ–¹å¼å¼¹å‡ºæ¶ˆæ¯
         if (data && data.Message && !data.IsSuccess) {
             ops.templateOption.isAlertShowMsg = true;
             dialogIcon = "error";
         }
 
-        //¹Ø±Õ´°¿ÚÖĞÕıÔÚÌáÊ¾µÄtips
+        //å…³é—­çª—å£ä¸­æ­£åœ¨æç¤ºçš„tips
         var list = art.dialog.list["Tips"];
         if (null != list) {
             list.close();
         }
 
-        //¶¨ÒåË¢ĞÂº¯Êı
+        //å®šä¹‰åˆ·æ–°å‡½æ•°
         var refresh = function () {
-            //Ìø×ª
+            //è·³è½¬
             if (data.IsRedirect && data.RedirectURL) {
                 location.href = data.RedirectURL;
                 return;
             }
-            //Ë¢ĞÂ
+            //åˆ·æ–°
             if (data.IsRefresh) {
                 setTimeout(function () {
                     ops.templateOption.refreshFunction.apply(this, arguments);
-                }, ops.templateOption.isAlertShowMsg ? 0 : 700);//ÑÓ³Ù0.7sµÄÄ¿µÄÊÇÔÚtipsÌáÊ¾µÄ³¡¾°ÏÂ£¬ÈÃÓÃ»§¶à¿´Ò»ÏÂÌáÊ¾Óï
+                }, ops.templateOption.isAlertShowMsg ? 0 : 700);//å»¶è¿Ÿ0.7sçš„ç›®çš„æ˜¯åœ¨tipsæç¤ºçš„åœºæ™¯ä¸‹ï¼Œè®©ç”¨æˆ·å¤šçœ‹ä¸€ä¸‹æç¤ºè¯­
             }
         };
 
         if (data.Message != "" && data.Message != null) {
             if (ops.templateOption.isAlertShowMsg) {
-                //ÒÔ¶Ô»°¿ò·½Ê½ÏÔÊ¾ÏûÏ¢
+                //ä»¥å¯¹è¯æ¡†æ–¹å¼æ˜¾ç¤ºæ¶ˆæ¯
                 art.dialog({
                     icon: dialogIcon,
                     content: "<div style='max-width:500px;'>" + data.Message + "</div>",
-                    cancelVal: 'ÖªµÀÁË',
+                    cancelVal: 'çŸ¥é“äº†',
                     cancel: function () {
                         refresh();
                     }
                 });
             } else {
-                //ÒÔtips·½Ê½ÏÔÊ¾ÏûÏ¢
+                //ä»¥tipsæ–¹å¼æ˜¾ç¤ºæ¶ˆæ¯
                 art.dialog.tips(data.Message);
                 refresh();
             }
@@ -329,11 +327,11 @@ $.XGoAjax.addTemplate({
 
     },
     templateOption: {
-        //ÇëÇóÇ°ÒªÌáÊ¾µÄĞÅÏ¢
-        beforeSendMsg: "ÕıÔÚ´¦ÀíÖĞ£¬ÇëÉÔºó...",
-        //true:ÒÔalertµÄ·½Ê½µ¯³öÏûÏ¢£¬µãÈ·¶¨»ò¹Ø±ÕÖ´ĞĞË¢ĞÂ»òÆäËüº¯Êı¡£false:ÒÔtipsµ¯³öÏûÏ¢
+        //è¯·æ±‚å‰è¦æç¤ºçš„ä¿¡æ¯
+        beforeSendMsg: "æ­£åœ¨å¤„ç†ä¸­ï¼Œè¯·ç¨å...",
+        //true:ä»¥alertçš„æ–¹å¼å¼¹å‡ºæ¶ˆæ¯ï¼Œç‚¹ç¡®å®šæˆ–å…³é—­æ‰§è¡Œåˆ·æ–°æˆ–å…¶å®ƒå‡½æ•°ã€‚false:ä»¥tipså¼¹å‡ºæ¶ˆæ¯
         isAlertShowMsg: true,
-        //Ë¢ĞÂº¯Êı
+        //åˆ·æ–°å‡½æ•°
         refreshFunction: function () {
             art.dialog.open.origin.location.reload();
         }
