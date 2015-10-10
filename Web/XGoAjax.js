@@ -8,12 +8,12 @@
  ********************************************************************************************
  * 2：使用说明：
  * 所有的ajax请求必须使用此方法调用，这样可以保证项目中的ajax统一处理，包括提示语，错误处理等。类似于管道功能，最终还是使用的jquery.ajax。
- * 当前版本：v1.0
- * 更新时间：2015-09-18
+ * 当前版本：v1.0.1
+ * 更新时间：2015-10-10
  */
 ; (function (win, doc, undefined) {
     "use strict";
-    
+
     //全局设置
     var _globalSettings = {};
 
@@ -89,12 +89,23 @@
             var $form = $("form:first");
             var action = $form.attr("action"), data = $form.serialize(), method = $form.attr("method");
 
-            $.each(ops.ajax, function (i, n) {
-                n.url = (n.url ? n.url : action) || win.location.href;
-                n.data = n.data ? n.data : data;
-                n.type = (n.type ? n.type : method) || "get";
-                ops.ajax[i] = $.extend({}, ajaxDefaults, n);
-            });
+            if(!ops.ajax || ops.ajax.length==0){
+                //如果没有传ajax参数，则使用默认值
+                ops.ajax=[{
+                    url : action || win.location.href,
+                    data : data,
+                    type : method || "get"
+                }];
+                ops.ajax[0] = $.extend({}, ajaxDefaults, ops.ajax[0]);
+            }else{
+                //如果有传ajax参数，则对参数进行进一步的处理
+                $.each(ops.ajax, function (i, n) {
+                    n.url = (n.url ? n.url : action) || win.location.href;
+                    n.data = n.data ? n.data : data;
+                    n.type = (n.type ? n.type : method) || "get";
+                    ops.ajax[i] = $.extend({}, ajaxDefaults, n);
+                });
+            }
 
             ops.templateOption = $.extend({}, ops.templateOption, tp.templateOption);
 
@@ -201,7 +212,6 @@
     $.XGoAjax.getGlobalSettings = function () {
         return _globalSettings || null;
     };
-
 })(window, document);
 
 /*
