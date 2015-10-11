@@ -78,7 +78,7 @@
 <tr>
 <td>ajax</td>
 <td>[]</td>
-<td>$.ajax选项，数组的每一项代表一个ajax请求，可以有多个ajax请求。默认值请参考【ajax默认选项】</td>
+<td>$.ajax选项，数组的每一项代表一个ajax请求，可以有多个ajax请求。默认值请参考【ajax默认选项】；如果没有传递此参数或数组项长度为0，则使用默认的ajax行为</td>
 </tr>
 </table>
 
