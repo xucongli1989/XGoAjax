@@ -7,12 +7,18 @@
  * Create By: XCL @ 2015.09 in Shenzhen. China
  ********************************************************************************************
  * 2：使用说明：
- * 所有的ajax请求必须使用此方法调用，这样可以保证项目中的ajax统一处理，包括提示语，错误处理等。类似于管道功能，最终还是使用的jquery.ajax。
- * 当前版本：v1.0.1
- * 更新时间：2015-10-10
+ *                      统一对ajax请求的结果进行处理，包括消息提示、错误处理等操作，这样可以保证我们的项目有一个统一的风格，同时也简化了大量的代码。
+ * 3：使用场景：
+ *                      a：ajax回调信息提示响应处理，比如提示成功或失败等消息。
+ *                      b：提交按钮需要在ajax请求中阻止提交（防止多次提交）
+ *                      c：同时发起多次ajax请求
+ * 当前版本：v1.0.2
+ * 更新时间：2015-10-25
  */
 ; (function (win, doc, undefined) {
     "use strict";
+
+    var _version = "v1.0.2，https://github.com/xucongli1989/XGoAjax";
 
     //全局设置
     var _globalSettings = {};
@@ -38,7 +44,13 @@
 
     /*插件默认选项*/
     var defaults = {
-        //发起请求的标识，可以随意指定，主要是便于判断该请求为同一类型的操作。比如，一个按钮来触发一个或一组ajax请求，就可以通过指定的id来判断这个按钮上一次触发的请求是否已执行完毕。如果未指定则默认为贪婪模式。
+        /*
+        发起请求的标识，可以随意指定，主要是便于判断该请求为同一类型的操作。
+        比如，一个表单提交按钮来触发一个或一组ajax请求的情况，我们可以指定id来标识用户单击这个提交按钮时的请求，
+        这样，如果是在独占模式情况下，本插件就会通过这个id，判断上一次请求是否已经结束，如果未结束，则不做任何处理，
+        如果已结束，则可以再重新发起请求。这样做的好处是，防止用户在短时间内，多次单击提交按钮。
+        （以往旧的做法是，在请求时，禁用这个按钮。）注意：如果未指定则默认为贪婪模式；在独占请求时，必须指定有效的值。
+        */
         id: "",
         //模板名，默认值在_globalSettings中设置
         templateName: "",
@@ -52,9 +64,9 @@
         complete: null,
         //模板自定义选项，此属性完全由用户在不同的模板中根据需要自定义
         templateOption: {},
-        //请求模式，exclusive：独占请求，要想再发起同样的一个请求，必须等待上次请求结束。；greedy：贪婪请求，不限制重复请求。默认值在_globalSettings中设置
-        mode: "",
-        //$.ajax选项，数组的每一项代表一个ajax请求，可以有多个ajax请求
+        //true:独占请求，要想再发起同样的一个请求，必须等待上次请求结束；false:贪婪请求，不限制重复请求。 默认值在_globalSettings中设置
+        isExclusive:true,
+        //$.ajax选项，数组的每一项代表一个ajax请求，可以有多个ajax请求。如果只有一个请求，可以不用数组，直接用{...}替代。如果没有传递此参数或数组项长度为0，则使用默认的ajax行为
         ajax: []
     };
 
@@ -89,6 +101,11 @@
             var $form = $("form:first");
             var action = $form.attr("action"), data = $form.serialize(), method = $form.attr("method");
 
+            //如果ajax参数不是数组，则把该值设置为数组的第一项
+            if (ops.ajax && !($.isArray(ops.ajax))) {
+                ops.ajax = [ops.ajax];
+            }
+
             if(!ops.ajax || ops.ajax.length==0){
                 //如果没有传ajax参数，则使用默认值
                 ops.ajax=[{
@@ -109,7 +126,10 @@
 
             ops.templateOption = $.extend({}, ops.templateOption, tp.templateOption);
 
-            if (ops.mode === "exclusive") {
+            if (ops.isExclusive) {
+                if (!ops.id) {
+                    throw new Error('Error：独占请求必须指定有效的id！');
+                }
                 //独占只能允许一个请求正在执行
                 var item = _getWorkById(ops.id);
                 if (item && item.state() === "pending") {
@@ -178,6 +198,9 @@
         }
     });
 
+    /*版本号*/
+    $.XGoAjax.version = _version;
+
     /*添加自定义模板*/
     $.XGoAjax.addTemplate = function (model) {
         if (model.name) {
@@ -200,11 +223,11 @@
         _globalSettings = $.extend({
             //默认模板名
             templateName: "default",
-            //默认请求模式
-            mode: "exclusive"
+            //是否独占请求
+            isExclusive: true
         }, setting || {});
         defaults.templateName = _globalSettings.templateName;
-        defaults.mode = _globalSettings.mode;
+        defaults.isExclusive = _globalSettings.isExclusive;
     };
     $.XGoAjax.globalSettings();
 
