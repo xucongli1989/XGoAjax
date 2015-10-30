@@ -41,7 +41,7 @@
 </tr>
 <tr>
 <td>templateName</td>
-<td>【全局设置】中的templateName属性</td>
+<td>【全局设置】中的templateName属性。如果未指定，则为"default"</td>
 <td>
 指定结果消息处理所使用的模板
 </td>
@@ -122,11 +122,11 @@ ops:当前插件选项
 <td>success</td>
 <td>function(ops, datas)</td>
 <td>
-成功后执行，datas为数组。
+成功后执行，datas为数组或对象。
 <br/>
 ops:当前插件选项
 <br/>
-datas:请求返回的数据
+datas:请求返回的数据，如果有多个ajax请求，则为数组，否则直接为输出的对象值。
 </td>
 </tr>
 <tr>
@@ -174,7 +174,7 @@ ops:当前插件选项
 
 </table>
 
-#方法
+# 方法
 <table>
 <tr>
 <td>方法名</td>
@@ -202,51 +202,103 @@ ops:当前插件选项
 </tr>
 </table>
 
-#基本使用示例
-- 每次单击发出一个ajax请求（当前必须只有一个请求，独占模式）
+# 基本使用示例
 
-        $.XGoAjax({
-            id: "btnSave1",
-            ajax: {
-                url: "data.aspx"
-            }
-        });
+            /**************默认模板：*******************/
 
-- 每次单击发出一个ajax请求（可以发出多个请求，贪婪模式）
+            //每次单击发出一个ajax请求（当前必须只有一个请求，独占模式）
+            $("#btnSave1").on("click", function () {
+                $.XGoAjax({
+                    id: "btnSave1",
+                    ajax: { url: "data.aspx" }
+                });
+            });
 
-        $.XGoAjax({
-            id: "btnSave2",
-            mode: "greedy",
-            ajax: {
-                url: "data.aspx"
-            }
-        });
+            //每次单击发出一个ajax请求（可以发出多个请求，贪婪模式）
+            $("#btnSave2").on("click", function () {
+                $.XGoAjax({
+                    isExclusive: false,
+                    ajax: { url: "data.aspx" }
+                });
+            });
 
-- 每次单击发出多个ajax请求（当前必须只有一组请求，独占模式）
+            //每次单击发出多个ajax请求（当前必须只有一组请求，独占模式）
+            $("#btnSave3").on("click", function () {
+                $.XGoAjax({
+                    id: "btnSave3",
+                    ajax: [{
+                        type: "get",
+                        url: "data.aspx"
+                    }, {
+                        type: "post",
+                        url: "data.aspx"
+                    }]
+                });
+            });
 
-        $.XGoAjax({
-            id: "btnSave3",
-            ajax: [{
-                type: "get",
-                url: "data.aspx"
-            }, {
-                type: "post",
-                url: "data.aspx"
-            }]
-        });
+            //每次单击发出多个ajax请求（可以发出多组请求，贪婪模式）
+            $("#btnSave4").on("click", function () {
+                $.XGoAjax({
+                    isExclusive: false,
+                    ajax: [{
+                        type: "get",
+                        url: "data.aspx"
+                    }, {
+                        type: "post",
+                        url: "data.aspx"
+                    }]
+                });
+            });
 
-- 每次单击发出多个ajax请求（可以发出多组请求，贪婪模式）
+            /**************artdialog模板：*******************/
 
-        $.XGoAjax({
-            id: "btnSave4",
-            mode: "greedy",
-            ajax: [{
-                type: "get",
-                url: "data.aspx"
-            }, {
-                type: "post",
-                url: "data.aspx"
-            }]
-        });
+            //每次单击发出一个ajax请求（当前必须只有一个请求，独占模式）
+            $("#btnSaveArtdialog1").on("click", function () {
+                $.XGoAjax({
+                    templateName: "artdialog",
+                    id: "btnSaveArtdialog1",
+                    ajax: { url: "data.aspx" }
+                });
+            });
+
+            //每次单击发出一个ajax请求（可以发出多个请求，贪婪模式）
+            $("#btnSaveArtdialog2").on("click", function () {
+                $.XGoAjax({
+                    templateName: "artdialog",
+                    isExclusive: false,
+                    ajax: { url: "data.aspx" }
+                });
+            });
+
+            //每次单击发出一个ajax请求（可以发出多个请求，贪婪模式）
+            $("#btnSaveArtdialog3").on("click", function () {
+                $.XGoAjax({
+                    templateName: "artdialog",
+                    id: "btnSaveArtdialog3",
+                    ajax: [{
+                        type: "get",
+                        url: "data.aspx"
+                    }, {
+                        type: "post",
+                        url: "data.aspx"
+                    }]
+                });
+            });
+
+            //每次单击发出多个ajax请求（可以发出多组请求，贪婪模式）
+            $("#btnSaveArtdialog4").on("click", function () {
+                $.XGoAjax({
+                    templateName: "artdialog",
+                    isExclusive: false,
+                    ajax: [{
+                        type: "get",
+                        url: "data.aspx"
+                    }, {
+                        type: "post",
+                        url: "data.aspx"
+                    }]
+                });
+            });
+
 
 **具体Demo请参见源码中的：XGoAjax\Web\Index.html**

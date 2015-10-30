@@ -21,13 +21,13 @@
             config['resize'] = true;
         })(art.dialog.defaults);
 
-        $(function () {
-            ////全局设置
-            //$.XGoAjax.globalSettings({
-            //    templateName: "artdialog",
-            //    isExclusive:false
-            //});
-        });
+        //$(function () {
+        //    //全局设置
+        //    $.XGoAjax.globalSettings({
+        //        templateName: "artdialog",
+        //        isExclusive:false
+        //    });
+        //});
     </script>
 </head>
 <body>
@@ -63,21 +63,23 @@
 
             /**************默认模板：*******************/
 
+            //每次单击发出一个ajax请求（当前必须只有一个请求，独占模式）
             $("#btnSave1").on("click", function () {
                 $.XGoAjax({
                     id: "btnSave1",
-                    ajax: {url: "data.aspx"}
+                    ajax: { url: "data.aspx" }
                 });
             });
 
+            //每次单击发出一个ajax请求（可以发出多个请求，贪婪模式）
             $("#btnSave2").on("click", function () {
                 $.XGoAjax({
-                    id: "btnSave2",
                     isExclusive: false,
-                    ajax: {url: "data.aspx"}
+                    ajax: { url: "data.aspx" }
                 });
             });
 
+            //每次单击发出多个ajax请求（当前必须只有一组请求，独占模式）
             $("#btnSave3").on("click", function () {
                 $.XGoAjax({
                     id: "btnSave3",
@@ -91,9 +93,9 @@
                 });
             });
 
+            //每次单击发出多个ajax请求（可以发出多组请求，贪婪模式）
             $("#btnSave4").on("click", function () {
                 $.XGoAjax({
-                    id: "btnSave4",
                     isExclusive: false,
                     ajax: [{
                         type: "get",
@@ -107,23 +109,25 @@
 
             /**************artdialog模板：*******************/
 
+            //每次单击发出一个ajax请求（当前必须只有一个请求，独占模式）
             $("#btnSaveArtdialog1").on("click", function () {
                 $.XGoAjax({
                     templateName: "artdialog",
                     id: "btnSaveArtdialog1",
-                    ajax: {url: "data.aspx"}
+                    ajax: { url: "data.aspx" }
                 });
             });
 
+            //每次单击发出一个ajax请求（可以发出多个请求，贪婪模式）
             $("#btnSaveArtdialog2").on("click", function () {
                 $.XGoAjax({
                     templateName: "artdialog",
-                    id: "btnSaveArtdialog2",
                     isExclusive: false,
-                    ajax: {url: "data.aspx"}
+                    ajax: { url: "data.aspx" }
                 });
             });
 
+            //每次单击发出一个ajax请求（可以发出多个请求，贪婪模式）
             $("#btnSaveArtdialog3").on("click", function () {
                 $.XGoAjax({
                     templateName: "artdialog",
@@ -138,10 +142,10 @@
                 });
             });
 
+            //每次单击发出多个ajax请求（可以发出多组请求，贪婪模式）
             $("#btnSaveArtdialog4").on("click", function () {
                 $.XGoAjax({
                     templateName: "artdialog",
-                    id: "btnSaveArtdialog4",
                     isExclusive: false,
                     ajax: [{
                         type: "get",

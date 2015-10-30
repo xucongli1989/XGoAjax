@@ -12,13 +12,13 @@
  *                      a：ajax回调信息提示响应处理，比如提示成功或失败等消息。
  *                      b：提交按钮需要在ajax请求中阻止提交（防止多次提交）
  *                      c：同时发起多次ajax请求
- * 当前版本：v1.0.2
- * 更新时间：2015-10-25
+ * 当前版本：v1.0.3
+ * 更新时间：2015-10-30
  */
 ; (function (win, doc, undefined) {
     "use strict";
 
-    var _version = "v1.0.2，https://github.com/xucongli1989/XGoAjax";
+    var _version = "v1.0.3，https://github.com/xucongli1989/XGoAjax";
 
     //全局设置
     var _globalSettings = {};
@@ -34,7 +34,7 @@
         before: function (ops) { return true; },
         //失败后
         error: function (ops) { },
-        //成功后，data为数组
+        //成功后，data为数组或对象
         success: function (ops, datas) { },
         //完成后
         complete: function (ops) { },
@@ -65,7 +65,7 @@
         //模板自定义选项，此属性完全由用户在不同的模板中根据需要自定义
         templateOption: {},
         //true:独占请求，要想再发起同样的一个请求，必须等待上次请求结束；false:贪婪请求，不限制重复请求。 默认值在_globalSettings中设置
-        isExclusive:true,
+        isExclusive: true,
         //$.ajax选项，数组的每一项代表一个ajax请求，可以有多个ajax请求。如果只有一个请求，可以不用数组，直接用{...}替代。如果没有传递此参数或数组项长度为0，则使用默认的ajax行为
         ajax: []
     };
@@ -97,7 +97,7 @@
         XGoAjax: function (ops) {
             ops = $.extend({}, defaults, ops || {});
             var dfd = null, isAllowRun = true;
-            var tp = _templates[ops.templateName];//当前模板
+            var tp = _templates[ops.templateName || "default"];//当前模板
             var $form = $("form:first");
             var action = $form.attr("action"), data = $form.serialize(), method = $form.attr("method");
 
@@ -106,15 +106,15 @@
                 ops.ajax = [ops.ajax];
             }
 
-            if(!ops.ajax || ops.ajax.length==0){
+            if (!ops.ajax || ops.ajax.length == 0) {
                 //如果没有传ajax参数，则使用默认值
-                ops.ajax=[{
-                    url : action || win.location.href,
-                    data : data,
-                    type : method || "get"
+                ops.ajax = [{
+                    url: action || win.location.href,
+                    data: data,
+                    type: method || "get"
                 }];
                 ops.ajax[0] = $.extend({}, ajaxDefaults, ops.ajax[0]);
-            }else{
+            } else {
                 //如果有传ajax参数，则对参数进行进一步的处理
                 $.each(ops.ajax, function (i, n) {
                     n.url = (n.url ? n.url : action) || win.location.href;
@@ -166,6 +166,11 @@
                         }
                     }
 
+                    //如果只有一个ajax请求，则datas不用设置为数组，直接为数组的第一项，也就是第一个ajax返回的结果
+                    if (ops.ajax.length == 1) {
+                        datas = datas[0];
+                    }
+
                     if (ops.success) {
                         ops.success.call(this, ops, datas);
                     } else {
@@ -205,6 +210,8 @@
     $.XGoAjax.addTemplate = function (model) {
         if (model.name) {
             _templates[model.name] = $.extend({}, defaultTemplate, model);
+        } else {
+            throw new Error("必须指定有效的模板名！");
         }
     };
 
@@ -264,9 +271,15 @@ $.XGoAjax.addTemplate({
         }
         */
         var msg = "";
-        $.each(datas, function (i, n) {
-            msg += n.Message;
-        });
+
+        if ($.isArray(datas)) {
+            $.each(datas, function (i, n) {
+                msg += n.Message;
+            });
+        } else {
+            msg = datas.Message;
+        }
+
         console.log(msg);
     },
     complete: function (ops) {
@@ -307,7 +320,8 @@ $.XGoAjax.addTemplate({
         }
         */
 
-        var data = datas[0];
+        var data = $.isArray(datas) ? datas[0] : datas;
+
         //artdialog图标
         var dialogIcon = "succeed";
 
