@@ -67,7 +67,15 @@
         //true:独占请求，要想再发起同样的一个请求，必须等待上次请求结束；false:贪婪请求，不限制重复请求。 默认值在_globalSettings中设置
         isExclusive: true,
         //$.ajax选项，数组的每一项代表一个ajax请求，可以有多个ajax请求。如果只有一个请求，可以不用数组，直接用{...}替代。如果没有传递此参数或数组项长度为0，则使用默认的ajax行为
-        ajax: []
+        ajax: [],
+        preBefore: null,
+        postBefore: null,
+        preSuccess: null,
+        postSuccess: null,
+        preComplete: null,
+        postComplete: null,
+        preError: null,
+        postError: null
     };
 
     /*$.ajax的默认选项*/
@@ -90,6 +98,11 @@
     };
     var _removeById = function (id) {
         delete _workList[id];
+    };
+
+    /*创建一个callback对象*/
+    var _createCallBacks = function () {
+        return $.Callbacks("stopOnFalse unique");
     };
 
     /*扩展jquery*/
@@ -140,11 +153,27 @@
             var beforeResult = false;
 
             if (isAllowRun) {
-                if (ops.before) {
-                    beforeResult = ops.before.call(this, ops);
-                } else {
-                    beforeResult = tp.before.call(this, ops);
+                var beforeCallBacks = _createCallBacks();
+                if (ops.preBefore) {
+                    beforeCallBacks.add(ops.preBefore);
                 }
+                if (ops.before) {
+                    beforeCallBacks.add(ops.before);
+                }
+                if (tp.before) {
+                    beforeCallBacks.add(tp.before);
+                }
+                if (ops.postBefore) {
+                    beforeCallBacks.add(ops.postBefore);
+                }
+
+                var _resultFlag = function () {
+                    beforeResult = true;
+                };
+
+                beforeCallBacks.add(_resultFlag);
+
+                beforeCallBacks.fire(ops);
             }
 
             if (isAllowRun && beforeResult) {
@@ -171,25 +200,52 @@
                         datas = datas[0];
                     }
 
-                    if (ops.success) {
-                        ops.success.call(this, ops, datas);
-                    } else {
-                        tp.success.call(this, ops, datas);
+                    var callbacks = _createCallBacks();
+                    if (ops.preSuccess) {
+                        callbacks.add(ops.preSuccess);
                     }
+                    if (ops.success) {
+                        callbacks.add(ops.success);
+                    }
+                    if (tp.success) {
+                        callbacks.add(tp.success);
+                    }
+                    if (ops.postSuccess) {
+                        callbacks.add(ops.postSuccess);
+                    }
+                    callbacks.fire(ops, datas);
                 }).always(function () {
                     _removeById(ops.id);
 
+                    var callbacks = _createCallBacks();
+                    if (ops.preComplete) {
+                        callbacks.add(ops.preComplete);
+                    }
                     if (ops.complete) {
-                        ops.complete.call(this, ops);
-                    } else {
-                        tp.complete.call(this, ops);
+                        callbacks.add(ops.complete);
                     }
+                    if (tp.complete) {
+                        callbacks.add(tp.complete);
+                    }
+                    if (ops.postComplete) {
+                        callbacks.add(ops.postComplete);
+                    }
+                    callbacks.fire(ops);
                 }).fail(function () {
-                    if (ops.error) {
-                        ops.error.call(this, ops);
-                    } else {
-                        tp.error.call(this, ops);
+                    var callbacks = _createCallBacks();
+                    if (ops.preError) {
+                        callbacks.add(ops.preError);
                     }
+                    if (ops.error) {
+                        callbacks.add(ops.error);
+                    }
+                    if (tp.error) {
+                        callbacks.add(tp.error);
+                    }
+                    if (ops.postError) {
+                        callbacks.add(ops.postError);
+                    }
+                    callbacks.fire(ops);
                 });
                 _addWork(ops.id, dfd);
             }
@@ -241,6 +297,11 @@
     /*获取本插件全局设置*/
     $.XGoAjax.getGlobalSettings = function () {
         return _globalSettings || null;
+    };
+
+    $.XGoAjax.preBefore = function () {
+    };
+    $.XGoAjax.postBefore = function () {
     };
 })(window, document);
 

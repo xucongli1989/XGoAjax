@@ -58,6 +58,14 @@
         </div>
     </fieldset>
 
+    <fieldset>
+        <legend class="title">各种事件：</legend>
+        <div>
+            <input type="button" id="btnSaveWithEvent" value="所有事件" />
+            <br /><br />
+        </div>
+    </fieldset>
+
     <script type="text/javascript">
         $(function () {
 
@@ -154,6 +162,41 @@
                         type: "post",
                         url: "data.aspx"
                     }]
+                });
+            });
+
+            /******************事件***********************/
+            $("#btnSaveWithEvent").on("click", function () {
+                var _this = this;
+                $.XGoAjax({
+                    id: "btnSaveWithEvent",
+                    ajax: { url: "data.aspx" },
+                    preBefore: function () {
+                        console.log("preBefore");
+                    },
+                    postBefore: function () {
+                        $(_this).prop({ "disabled": true });
+                        console.log("postBefore");
+                    },
+                    preSuccess: function () {
+                        console.log("preSuccess");
+                    },
+                    postSuccess: function () {
+                        console.log("postSuccess");
+                    },
+                    preComplete: function () {
+                        $(_this).prop({ "disabled": false });
+                        console.log("preComplete");
+                    },
+                    postComplete: function () {
+                        console.log("postComplete");
+                    },
+                    preError: function () {
+                        console.log("preError");
+                    },
+                    postError: function () {
+                        console.log("postError");
+                    }
                 });
             });
 
