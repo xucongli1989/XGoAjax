@@ -50,22 +50,22 @@
 <tr>
 <td>before</td>
 <td>null</td>
-<td>请求前function，如果未指定，则执行模板中的before函数</td>
+<td>ajax请求前function，如果未指定，则执行模板中的before函数</td>
 </tr>
 <tr>
 <td>error</td>
 <td>null</td>
-<td>失败后function，如果未指定，则执行模板中的error函数</td>
+<td>ajax失败后function，如果未指定，则执行模板中的error函数</td>
 </tr>
 <tr>
 <td>success</td>
 <td>null</td>
-<td>成功后function，如果未指定，则执行模板中的success函数</td>
+<td>ajax成功后function，如果未指定，则执行模板中的success函数</td>
 </tr>
 <tr>
 <td>complete</td>
 <td>null</td>
-<td>完成后function，如果未指定，则执行模板中的complete函数</td>
+<td>ajax完成后function，如果未指定，则执行模板中的complete函数</td>
 </tr>
 <tr>
 <td>templateOption</td>
@@ -85,6 +85,56 @@ true:独占请求，要想再发起同样的一个请求，必须等待上次请
 <td>ajax</td>
 <td>[]</td>
 <td>$.ajax选项，数组的每一项代表一个ajax请求，可以有多个ajax请求。如果只有一个请求，可以不用数组，直接用{...}替代。如果没有传递此参数或数组项长度为0，则使用默认的ajax行为。默认值请参考【ajax默认选项】。</td>
+</tr>
+<tr>
+<td>target</td>
+<td>null</td>
+<td>发起事件的对象，主要是便于对该对象进行锁定等操作</td>
+</tr>
+<tr>
+<td>targetOption</td>
+<td>{}</td>
+<td>target自定义选项</td>
+</tr>
+<tr>
+<td>preBefore</td>
+<td>null</td>
+<td>在before前执行，如果返回fase，则不再执行before的后续操作，同时也终止本次ajax请求</td>
+</tr>
+<tr>
+<td>postBefore</td>
+<td>null</td>
+<td>在before后执行，如果返回fase，则终止本次ajax请求</td>
+</tr>
+<tr>
+<td>preSuccess</td>
+<td>null</td>
+<td>在success前执行，如果返回fase，则不再执行success的后续操作</td>
+</tr>
+<tr>
+<td>postSuccess</td>
+<td>null</td>
+<td>在success后执行</td>
+</tr>
+<tr>
+<td>preComplete</td>
+<td>null</td>
+<td>在complete前执行，如果返回fase，则不再执行complete的后续操作</td>
+</tr>
+<tr>
+<td>postComplete</td>
+<td>null</td>
+<td>在complete后执行</td>
+</tr>
+<tr>
+<td>preError</td>
+<td>null</td>
+<td>在error前执行，如果返回fase，则不再执行error的后续操作</td>
+</tr>
+<tr>
+<td>postError</td>
+<td>null</td>
+<td>在error后执行</td>
 </tr>
 </table>
 
@@ -204,6 +254,7 @@ ops:当前插件选项
 
 # 基本使用示例
 
+
             /**************默认模板：*******************/
 
             //每次单击发出一个ajax请求（当前必须只有一个请求，独占模式）
@@ -299,6 +350,87 @@ ops:当前插件选项
                     }]
                 });
             });
+
+            /******************事件***********************/
+
+            //所有事件（基本）
+            $("#btnSaveWithEvent").on("click", function () {
+                var _this = this;
+                $.XGoAjax({
+                    id: "btnSaveWithEvent",
+                    ajax: { url: "data.aspx" },
+                    preBefore: function () {
+                        console.log("preBefore");
+                    },
+                    postBefore: function () {
+                        console.log("postBefore");
+                    },
+                    preSuccess: function () {
+                        console.log("preSuccess");
+                    },
+                    postSuccess: function () {
+                        console.log("postSuccess");
+                    },
+                    preComplete: function () {
+                        console.log("preComplete");
+                    },
+                    postComplete: function () {
+                        console.log("postComplete");
+                    },
+                    preError: function () {
+                        console.log("preError");
+                    },
+                    postError: function () {
+                        console.log("postError");
+                    }
+                });
+            });
+
+            //before返回false时
+            $("#btnSaveWithEvent1").on("click", function () {
+                $.XGoAjax({
+                    id: "btnSaveWithEvent1",
+                    ajax: { url: "data.aspx" },
+                    preBefore: function () {
+                        console.log("preBefore");
+                        return false;
+                    },
+                    postBefore: function () {
+                        console.log("postBefore");
+                    },
+                    preSuccess: function () {
+                        console.log("preSuccess");
+                    },
+                    postSuccess: function () {
+                        console.log("postSuccess");
+                    },
+                    preComplete: function () {
+                        console.log("preComplete");
+                    },
+                    postComplete: function () {
+                        console.log("postComplete");
+                    },
+                    preError: function () {
+                        console.log("preError");
+                    },
+                    postError: function () {
+                        console.log("postError");
+                    }
+                });
+            });
+
+            //指定target，在请求中禁用按钮
+            $("#btnSaveWithEvent2").on("click", function () {
+                var _this = this;
+                $.XGoAjax({
+                    templateName: "artdialog",
+                    target: _this,
+                    isExclusive: false,
+                    id: "btnSaveWithEvent2",
+                    ajax: { url: "data.aspx" }
+                });
+            });
+
 
 
 **具体Demo请参见源码中的：XGoAjax\Web\Index.html**
