@@ -41,6 +41,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Data.aspx" />
+    <Content Include="XGoAjaxTemplate.js" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

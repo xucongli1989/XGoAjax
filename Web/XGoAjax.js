@@ -15,7 +15,7 @@
  * 当前版本：v1.0.3
  * 更新时间：2015-10-30
  */
-; (function (win, doc, undefined) {
+; (function (win, doc, $, undefined) {
     "use strict";
 
     var _version = "v1.0.3，https://github.com/xucongli1989/XGoAjax";
@@ -30,13 +30,13 @@
     var defaultTemplate = {
         //模板名
         name: "",
-        //请求前，如果返回false，则阻止后续执行。
+        //ajax请求前，如果返回false，则阻止后续执行。
         before: function (ops) { return true; },
-        //失败后
+        //ajax失败后
         error: function (ops) { },
-        //成功后，data为数组或对象
+        //ajax成功后，data为数组或对象
         success: function (ops, datas) { },
-        //完成后
+        //ajax完成后
         complete: function (ops) { },
         //模板自定义选项，此属性完全由用户在不同的模板中根据需要自定义
         templateOption: {}
@@ -54,13 +54,13 @@
         id: "",
         //模板名，默认值在_globalSettings中设置
         templateName: "",
-        //请求前function，如果未指定，则执行模板中的before函数
+        //ajax请求前function，如果未指定，则执行模板中的before函数
         before: null,
-        //失败后function，如果未指定，则执行模板中的error函数
+        //ajax失败后function，如果未指定，则执行模板中的error函数
         error: null,
-        //成功后function，如果未指定，则执行模板中的success函数
+        //ajax成功后function，如果未指定，则执行模板中的success函数
         success: null,
-        //完成后function，如果未指定，则执行模板中的complete函数
+        //ajax完成后function，如果未指定，则执行模板中的complete函数
         complete: null,
         //模板自定义选项，此属性完全由用户在不同的模板中根据需要自定义
         templateOption: {},
@@ -68,13 +68,26 @@
         isExclusive: true,
         //$.ajax选项，数组的每一项代表一个ajax请求，可以有多个ajax请求。如果只有一个请求，可以不用数组，直接用{...}替代。如果没有传递此参数或数组项长度为0，则使用默认的ajax行为
         ajax: [],
+
+        //发起事件的对象，主要是便于对该对象进行锁定等操作
+        target: null,
+        //target自定义选项
+        targetOption: {},
+        //在before前执行，如果返回fase，则不再执行before的后续操作，同时也终止本次ajax请求
         preBefore: null,
+        //在before后执行，如果返回fase，则终止本次ajax请求
         postBefore: null,
+        //在success前执行，如果返回fase，则不再执行success的后续操作
         preSuccess: null,
+        //在success后执行
         postSuccess: null,
+        //在complete前执行，如果返回fase，则不再执行complete的后续操作
         preComplete: null,
+        //在complete后执行
         postComplete: null,
+        //在error前执行，如果返回fase，则不再执行error的后续操作
         preError: null,
+        //在error后执行
         postError: null
     };
 
@@ -105,165 +118,185 @@
         return $.Callbacks("stopOnFalse unique");
     };
 
-    /*扩展jquery*/
-    $.extend({
-        XGoAjax: function (ops) {
-            ops = $.extend({}, defaults, ops || {});
-            var dfd = null, isAllowRun = true;
-            var tp = _templates[ops.templateName || "default"];//当前模板
-            var $form = $("form:first");
-            var action = $form.attr("action"), data = $form.serialize(), method = $form.attr("method");
+    var _go = function (ops) {
+        ops = $.extend({}, defaults, ops || {});
+        var dfd = null, isAllowRun = true;
+        var tp = _templates[ops.templateName || "default"];//当前模板
+        var $form = $("form:first");
+        var action = $form.attr("action"), data = $form.serialize(), method = $form.attr("method");
 
-            //如果ajax参数不是数组，则把该值设置为数组的第一项
-            if (ops.ajax && !($.isArray(ops.ajax))) {
-                ops.ajax = [ops.ajax];
-            }
-
-            if (!ops.ajax || ops.ajax.length == 0) {
-                //如果没有传ajax参数，则使用默认值
-                ops.ajax = [{
-                    url: action || win.location.href,
-                    data: data,
-                    type: method || "get"
-                }];
-                ops.ajax[0] = $.extend({}, ajaxDefaults, ops.ajax[0]);
-            } else {
-                //如果有传ajax参数，则对参数进行进一步的处理
-                $.each(ops.ajax, function (i, n) {
-                    n.url = (n.url ? n.url : action) || win.location.href;
-                    n.data = n.data ? n.data : data;
-                    n.type = (n.type ? n.type : method) || "get";
-                    ops.ajax[i] = $.extend({}, ajaxDefaults, n);
-                });
-            }
-
-            ops.templateOption = $.extend({}, ops.templateOption, tp.templateOption);
-
-            if (ops.isExclusive) {
-                if (!ops.id) {
-                    throw new Error('Error：独占请求必须指定有效的id！');
-                }
-                //独占只能允许一个请求正在执行
-                var item = _getWorkById(ops.id);
-                if (item && item.state() === "pending") {
-                    isAllowRun = false;
-                }
-            }
-
-            var beforeResult = false;
-
-            if (isAllowRun) {
-                var beforeCallBacks = _createCallBacks();
-                if (ops.preBefore) {
-                    beforeCallBacks.add(ops.preBefore);
-                }
-                if (ops.before) {
-                    beforeCallBacks.add(ops.before);
-                }
-                if (tp.before) {
-                    beforeCallBacks.add(tp.before);
-                }
-                if (ops.postBefore) {
-                    beforeCallBacks.add(ops.postBefore);
-                }
-
-                var _resultFlag = function () {
-                    beforeResult = true;
-                };
-
-                beforeCallBacks.add(_resultFlag);
-
-                beforeCallBacks.fire(ops);
-            }
-
-            if (isAllowRun && beforeResult) {
-                //只有当before返回true时，才执行请求
-                var ajaxDeferred = [];
-                $.each(ops.ajax, function (i, n) {
-                    ajaxDeferred.push($.ajax(n));
-                });
-                dfd = $.when.apply($, ajaxDeferred).done(function () {
-                    var datas = [], args = arguments, d = null;
-
-                    for (var i = 0; i < ops.ajax.length; i++) {
-                        d = ops.ajax.length > 1 ? args[i][0] : args[0];
-                        if (ops.ajax[i].dataType.toUpperCase() === "JSON" && !(d instanceof Object)) {
-                            //如果请求类型为json，但是返回的不是一个对象，则将返回值转为json
-                            datas.push($.parseJSON(d));
-                        } else {
-                            datas.push(d);
-                        }
-                    }
-
-                    //如果只有一个ajax请求，则datas不用设置为数组，直接为数组的第一项，也就是第一个ajax返回的结果
-                    if (ops.ajax.length == 1) {
-                        datas = datas[0];
-                    }
-
-                    var callbacks = _createCallBacks();
-                    if (ops.preSuccess) {
-                        callbacks.add(ops.preSuccess);
-                    }
-                    if (ops.success) {
-                        callbacks.add(ops.success);
-                    }
-                    if (tp.success) {
-                        callbacks.add(tp.success);
-                    }
-                    if (ops.postSuccess) {
-                        callbacks.add(ops.postSuccess);
-                    }
-                    callbacks.fire(ops, datas);
-                }).always(function () {
-                    _removeById(ops.id);
-
-                    var callbacks = _createCallBacks();
-                    if (ops.preComplete) {
-                        callbacks.add(ops.preComplete);
-                    }
-                    if (ops.complete) {
-                        callbacks.add(ops.complete);
-                    }
-                    if (tp.complete) {
-                        callbacks.add(tp.complete);
-                    }
-                    if (ops.postComplete) {
-                        callbacks.add(ops.postComplete);
-                    }
-                    callbacks.fire(ops);
-                }).fail(function () {
-                    var callbacks = _createCallBacks();
-                    if (ops.preError) {
-                        callbacks.add(ops.preError);
-                    }
-                    if (ops.error) {
-                        callbacks.add(ops.error);
-                    }
-                    if (tp.error) {
-                        callbacks.add(tp.error);
-                    }
-                    if (ops.postError) {
-                        callbacks.add(ops.postError);
-                    }
-                    callbacks.fire(ops);
-                });
-                _addWork(ops.id, dfd);
-            }
-
-            //返回当前请求状态
-            ops.getState = function () {
-                return dfd ? dfd.state() : null;
-            };
-
-            return dfd ? dfd : null;
+        if (!tp) {
+            throw new Error("请指定一个有效的模板！");
         }
-    });
+
+        //如果ajax参数不是数组，则把该值设置为数组的第一项
+        if (ops.ajax && !($.isArray(ops.ajax))) {
+            ops.ajax = [ops.ajax];
+        }
+
+        if (!ops.ajax || ops.ajax.length == 0) {
+            //如果没有传ajax参数，则使用默认值
+            ops.ajax = [{
+                url: action || win.location.href,
+                data: data,
+                type: method || "get"
+            }];
+            ops.ajax[0] = $.extend({}, ajaxDefaults, ops.ajax[0]);
+        } else {
+            //如果有传ajax参数，则对参数进行进一步的处理
+            $.each(ops.ajax, function (i, n) {
+                n.url = (n.url ? n.url : action) || win.location.href;
+                n.data = n.data ? n.data : data;
+                n.type = (n.type ? n.type : method) || "get";
+                ops.ajax[i] = $.extend({}, ajaxDefaults, n);
+            });
+        }
+
+        ops.templateOption = $.extend({}, ops.templateOption, tp.templateOption);
+
+        //独占模式时，验证相关信息
+        if (ops.isExclusive) {
+            if (!ops.id) {
+                throw new Error('Error：独占请求必须指定有效的id！');
+            }
+            //独占只能允许一个请求正在执行
+            var item = _getWorkById(ops.id);
+            if (item && item.state() === "pending") {
+                isAllowRun = false;
+            }
+        }
+
+        //before返回的结果，如果为false，则后续的ajax请求根本就不用执行了。
+        var beforeResult = false;
+
+        //before回调
+        var beforeCall = function (ops) {
+            var beforeCallBacks = _createCallBacks();
+            if (ops.preBefore) {
+                beforeCallBacks.add(ops.preBefore);
+            }
+            if (ops.before) {
+                beforeCallBacks.add(ops.before);
+            }
+            if (tp.before) {
+                beforeCallBacks.add(tp.before);
+            }
+            if (ops.postBefore) {
+                beforeCallBacks.add(ops.postBefore);
+            }
+            beforeCallBacks.add(function () {
+                beforeResult = true;
+            });
+            beforeCallBacks.fire(ops);
+        };
+        //success回调
+        var successCall = function (ops, datas) {
+            var callbacks = _createCallBacks();
+            if (ops.preSuccess) {
+                callbacks.add(ops.preSuccess);
+            }
+            if (ops.success) {
+                callbacks.add(ops.success);
+            }
+            if (tp.success) {
+                callbacks.add(tp.success);
+            }
+            if (ops.postSuccess) {
+                callbacks.add(ops.postSuccess);
+            }
+            callbacks.fire(ops, datas);
+        };
+        //error回调
+        var errorCall = function (ops) {
+            var callbacks = _createCallBacks();
+            if (ops.preError) {
+                callbacks.add(ops.preError);
+            }
+            if (ops.error) {
+                callbacks.add(ops.error);
+            }
+            if (tp.error) {
+                callbacks.add(tp.error);
+            }
+            if (ops.postError) {
+                callbacks.add(ops.postError);
+            }
+            callbacks.fire(ops);
+        };
+        //complete回调
+        var completeCall = function (ops) {
+            var callbacks = _createCallBacks();
+            if (ops.preComplete) {
+                callbacks.add(ops.preComplete);
+            }
+            if (ops.complete) {
+                callbacks.add(ops.complete);
+            }
+            if (tp.complete) {
+                callbacks.add(tp.complete);
+            }
+            if (ops.postComplete) {
+                callbacks.add(ops.postComplete);
+            }
+            callbacks.fire(ops);
+        };
+
+        //如果允许执行，则调用before
+        if (isAllowRun) {
+            beforeCall.call(this, ops);
+        }
+
+        //允许执行，且只有当before返回true时，才执行ajax请求
+        if (isAllowRun && beforeResult) {
+            var ajaxDeferred = [];
+            $.each(ops.ajax, function (i, n) {
+                ajaxDeferred.push($.ajax(n));
+            });
+            dfd = $.when.apply($, ajaxDeferred).done(function () {
+                var datas = [], args = arguments, d = null;
+
+                for (var i = 0; i < ops.ajax.length; i++) {
+                    d = ops.ajax.length > 1 ? args[i][0] : args[0];
+                    if (ops.ajax[i].dataType.toUpperCase() === "JSON" && !(d instanceof Object)) {
+                        //如果请求类型为json，但是返回的不是一个对象，则将返回值转为json
+                        datas.push($.parseJSON(d));
+                    } else {
+                        datas.push(d);
+                    }
+                }
+
+                //如果只有一个ajax请求，则datas不用设置为数组，直接为数组的第一项，也就是第一个ajax返回的结果
+                if (ops.ajax.length == 1) {
+                    datas = datas[0];
+                }
+                successCall.call(this, ops, datas);
+            }).always(function () {
+                _removeById(ops.id);
+                completeCall.call(this, ops);
+            }).fail(function () {
+                errorCall.call(this, ops);
+            });
+            _addWork(ops.id, dfd);
+        };
+
+        //允许执行，且只有当before返回false时，直接调用complete即可
+        if (isAllowRun && !beforeResult) {
+            completeCall.call(null, ops);
+        }
+
+        //返回当前请求状态
+        ops.getState = function () {
+            return dfd ? dfd.state() : null;
+        };
+
+        return dfd ? dfd : null;
+    };
 
     /*版本号*/
-    $.XGoAjax.version = _version;
+    _go.version = _version;
 
     /*添加自定义模板*/
-    $.XGoAjax.addTemplate = function (model) {
+    _go.addTemplate = function (model) {
         if (model.name) {
             _templates[model.name] = $.extend({}, defaultTemplate, model);
         } else {
@@ -272,17 +305,17 @@
     };
 
     /*获取当前的ajax列表对象*/
-    $.XGoAjax.getAjaxList = function () {
+    _go.getAjaxList = function () {
         return _workList;
     };
 
     /*根据模板名获取模板对象*/
-    $.XGoAjax.getTemplate = function (name) {
+    _go.getTemplate = function (name) {
         return _templates[name] || null;
     };
 
     /*本插件全局设置*/
-    $.XGoAjax.globalSettings = function (setting) {
+    _go.globalSettings = function (setting) {
         _globalSettings = $.extend({
             //默认模板名
             templateName: "default",
@@ -292,160 +325,15 @@
         defaults.templateName = _globalSettings.templateName;
         defaults.isExclusive = _globalSettings.isExclusive;
     };
-    $.XGoAjax.globalSettings();
+    _go.globalSettings();
 
     /*获取本插件全局设置*/
-    $.XGoAjax.getGlobalSettings = function () {
+    _go.getGlobalSettings = function () {
         return _globalSettings || null;
     };
 
-    $.XGoAjax.preBefore = function () {
-    };
-    $.XGoAjax.postBefore = function () {
-    };
-})(window, document);
-
-/*
-***************************************************************************************************************************************************************************************************
-* 以下为模板，可根据您的项目需要，自行添加相应的模板方法即可。
-***************************************************************************************************************************************************************************************************
-*/
-
-/*默认模板*/
-$.XGoAjax.addTemplate({
-    name: "default",
-    before: function (ops) {
-        console.log("正在执行中，请稍后...");
-        return true;
-    },
-    error: function (ops) {
-        console.log("请求失败！");
-    },
-    success: function (ops, datas) {
-        /*
-        请求成功后返回的data格式：
-        data={
-            //提示语
-            Message:"",
-            //更多
-            ...
-        }
-        */
-        var msg = "";
-
-        if ($.isArray(datas)) {
-            $.each(datas, function (i, n) {
-                msg += n.Message;
-            });
-        } else {
-            msg = datas.Message;
-        }
-
-        console.log(msg);
-    },
-    complete: function (ops) {
-        console.log("请求已完成！");
-    }
-});
-
-/*artdialog模板*/
-$.XGoAjax.addTemplate({
-    name: "artdialog",
-    before: function (ops) {
-        art.dialog.tips(ops.templateOption.beforeSendMsg, 99999999999);
-        return true;
-    },
-    error: function (ops) {
-        art.dialog.tips("抱歉，请求出错啦！");
-    },
-    success: function (ops, datas) {
-        /*
-        请求成功后返回的data格式：
-        data={
-            //提示标题
-            Title:"",
-            //提示语
-            Message:"",
-            //是否成功
-            IsSuccess:false,
-            //是否进行刷新
-            IsRefresh:false,
-            //是否需要跳转
-            IsRedirect:false,
-            //要跳转的url
-            RedirectURL:"",
-            //自定义输出对象
-            CustomObject:null,
-            //更多
-            ...
-        }
-        */
-
-        var data = $.isArray(datas) ? datas[0] : datas;
-
-        //artdialog图标
-        var dialogIcon = "succeed";
-
-        //如果失败且有提示语，则以alert方式弹出消息
-        if (data && data.Message && !data.IsSuccess) {
-            ops.templateOption.isAlertShowMsg = true;
-            dialogIcon = "error";
-        }
-
-        //关闭窗口中正在提示的tips
-        var list = art.dialog.list["Tips"];
-        if (null != list) {
-            list.close();
-        }
-
-        //定义刷新函数
-        var refresh = function () {
-            //跳转
-            if (data.IsRedirect && data.RedirectURL) {
-                location.href = data.RedirectURL;
-                return;
-            }
-            //刷新
-            if (data.IsRefresh) {
-                setTimeout(function () {
-                    ops.templateOption.refreshFunction.apply(this, arguments);
-                }, ops.templateOption.isAlertShowMsg ? 0 : 700);//延迟0.7s的目的是在tips提示的场景下，让用户多看一下提示语
-            }
-        };
-
-        if (data.Message != "" && data.Message != null) {
-            if (ops.templateOption.isAlertShowMsg) {
-                //以对话框方式显示消息
-                art.dialog({
-                    icon: dialogIcon,
-                    content: "<div style='max-width:500px;'>" + data.Message + "</div>",
-                    cancelVal: '知道了',
-                    cancel: function () {
-                        refresh();
-                    }
-                });
-            } else {
-                //以tips方式显示消息
-                art.dialog.tips(data.Message);
-                refresh();
-            }
-        }
-    },
-    complete: function (ops) {
-        //关闭窗口中正在提示的tips
-        var list = art.dialog.list["Tips"];
-        if (null != list) {
-            list.close();
-        }
-    },
-    templateOption: {
-        //请求前要提示的信息
-        beforeSendMsg: "正在处理中，请稍后...",
-        //true:以alert的方式弹出消息，点确定或关闭执行刷新或其它函数。false:以tips弹出消息
-        isAlertShowMsg: true,
-        //刷新函数
-        refreshFunction: function () {
-            art.dialog.open.origin.location.reload();
-        }
-    }
-});
+    /*扩展jquery*/
+    $.extend({
+        XGoAjax: _go
+    });
+})(window, document, jQuery);

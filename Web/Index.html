@@ -1,11 +1,12 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+    <script src="jquery-1.11.3.min.js"></script>
     <link href="plugin/artDialog/skins/blue.css" rel="stylesheet" />
     <script src="plugin/artDialog/artDialog.js"></script>
     <script src="plugin/artDialog/plugins/iframeTools.js"></script>
-    <script type="text/javascript" src="XGoAjax.js"></script>
+    <script src="XGoAjax.js"></script>
+    <script src="XGoAjaxTemplate.js"></script>
     <style>
         .title {
             color: #f00;
@@ -61,7 +62,11 @@
     <fieldset>
         <legend class="title">各种事件：</legend>
         <div>
-            <input type="button" id="btnSaveWithEvent" value="所有事件" />
+            <input type="button" id="btnSaveWithEvent" value="所有事件（基本）" />
+            <br /><br />
+            <input type="button" id="btnSaveWithEvent1" value="before返回false时" />
+            <br /><br />
+            <input type="button" id="btnSaveWithEvent2" value="指定target，在请求中禁用按钮" />
             <br /><br />
         </div>
     </fieldset>
@@ -166,6 +171,8 @@
             });
 
             /******************事件***********************/
+
+            //所有事件（基本）
             $("#btnSaveWithEvent").on("click", function () {
                 var _this = this;
                 $.XGoAjax({
@@ -175,7 +182,6 @@
                         console.log("preBefore");
                     },
                     postBefore: function () {
-                        $(_this).prop({ "disabled": true });
                         console.log("postBefore");
                     },
                     preSuccess: function () {
@@ -185,7 +191,6 @@
                         console.log("postSuccess");
                     },
                     preComplete: function () {
-                        $(_this).prop({ "disabled": false });
                         console.log("preComplete");
                     },
                     postComplete: function () {
@@ -197,6 +202,51 @@
                     postError: function () {
                         console.log("postError");
                     }
+                });
+            });
+
+            //before返回false时
+            $("#btnSaveWithEvent1").on("click", function () {
+                $.XGoAjax({
+                    id: "btnSaveWithEvent1",
+                    ajax: { url: "data.aspx" },
+                    preBefore: function () {
+                        console.log("preBefore");
+                        return false;
+                    },
+                    postBefore: function () {
+                        console.log("postBefore");
+                    },
+                    preSuccess: function () {
+                        console.log("preSuccess");
+                    },
+                    postSuccess: function () {
+                        console.log("postSuccess");
+                    },
+                    preComplete: function () {
+                        console.log("preComplete");
+                    },
+                    postComplete: function () {
+                        console.log("postComplete");
+                    },
+                    preError: function () {
+                        console.log("preError");
+                    },
+                    postError: function () {
+                        console.log("postError");
+                    }
+                });
+            });
+
+            //指定target，在请求中禁用按钮
+            $("#btnSaveWithEvent2").on("click", function () {
+                var _this = this;
+                $.XGoAjax({
+                    templateName: "artdialog",
+                    target: _this,
+                    isExclusive: false,
+                    id: "btnSaveWithEvent2",
+                    ajax: { url: "data.aspx" }
                 });
             });
 
