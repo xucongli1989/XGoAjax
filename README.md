@@ -48,26 +48,6 @@
 </tr>
 
 <tr>
-<td>before</td>
-<td>null</td>
-<td>ajax请求前function，如果未指定，则执行模板中的before函数</td>
-</tr>
-<tr>
-<td>error</td>
-<td>null</td>
-<td>ajax失败后function，如果未指定，则执行模板中的error函数</td>
-</tr>
-<tr>
-<td>success</td>
-<td>null</td>
-<td>ajax成功后function，如果未指定，则执行模板中的success函数</td>
-</tr>
-<tr>
-<td>complete</td>
-<td>null</td>
-<td>ajax完成后function，如果未指定，则执行模板中的complete函数</td>
-</tr>
-<tr>
 <td>templateOption</td>
 <td>{}</td>
 <td>
@@ -102,6 +82,11 @@ true:独占请求，要想再发起同样的一个请求，必须等待上次请
 <td>在before前执行，如果返回fase，则不再执行before的后续操作，同时也终止本次ajax请求</td>
 </tr>
 <tr>
+<td>before</td>
+<td>null</td>
+<td>ajax请求前function，如果未指定，则执行模板中的before函数，如果返回fase，则不再执行before的后续操作，同时也终止本次ajax请求</td>
+</tr>
+<tr>
 <td>postBefore</td>
 <td>null</td>
 <td>在before后执行，如果返回fase，则终止本次ajax请求</td>
@@ -110,6 +95,11 @@ true:独占请求，要想再发起同样的一个请求，必须等待上次请
 <td>preSuccess</td>
 <td>null</td>
 <td>在success前执行，如果返回fase，则不再执行success的后续操作</td>
+</tr>
+<tr>
+<td>success</td>
+<td>null</td>
+<td>ajax成功后function，如果未指定，则执行模板中的success函数，如果返回fase，则不再执行success的后续操作</td>
 </tr>
 <tr>
 <td>postSuccess</td>
@@ -122,6 +112,11 @@ true:独占请求，要想再发起同样的一个请求，必须等待上次请
 <td>在complete前执行，如果返回fase，则不再执行complete的后续操作</td>
 </tr>
 <tr>
+<td>complete</td>
+<td>null</td>
+<td>ajax完成后function，如果未指定，则执行模板中的complete函数，如果返回fase，则不再执行complete的后续操作</td>
+</tr>
+<tr>
 <td>postComplete</td>
 <td>null</td>
 <td>在complete后执行</td>
@@ -130,6 +125,11 @@ true:独占请求，要想再发起同样的一个请求，必须等待上次请
 <td>preError</td>
 <td>null</td>
 <td>在error前执行，如果返回fase，则不再执行error的后续操作</td>
+</tr>
+<tr>
+<td>error</td>
+<td>null</td>
+<td>ajax失败后function，如果未指定，则执行模板中的error函数，如果返回fase，则不再执行error的后续操作</td>
 </tr>
 <tr>
 <td>postError</td>
@@ -434,3 +434,6 @@ ops:当前插件选项
 
 
 **具体Demo请参见源码中的：XGoAjax\Web\Index.html**
+
+# 事件调用流程图
+

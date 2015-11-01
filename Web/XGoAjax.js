@@ -54,14 +54,6 @@
         id: "",
         //模板名，默认值在_globalSettings中设置
         templateName: "",
-        //ajax请求前function，如果未指定，则执行模板中的before函数
-        before: null,
-        //ajax失败后function，如果未指定，则执行模板中的error函数
-        error: null,
-        //ajax成功后function，如果未指定，则执行模板中的success函数
-        success: null,
-        //ajax完成后function，如果未指定，则执行模板中的complete函数
-        complete: null,
         //模板自定义选项，此属性完全由用户在不同的模板中根据需要自定义
         templateOption: {},
         //true:独占请求，要想再发起同样的一个请求，必须等待上次请求结束；false:贪婪请求，不限制重复请求。 默认值在_globalSettings中设置
@@ -75,18 +67,26 @@
         targetOption: {},
         //在before前执行，如果返回fase，则不再执行before的后续操作，同时也终止本次ajax请求
         preBefore: null,
+        //ajax请求前function，如果未指定，则执行模板中的before函数，如果返回fase，则不再执行before的后续操作，同时也终止本次ajax请求
+        before: null,
         //在before后执行，如果返回fase，则终止本次ajax请求
         postBefore: null,
         //在success前执行，如果返回fase，则不再执行success的后续操作
         preSuccess: null,
+        //ajax成功后function，如果未指定，则执行模板中的success函数，如果返回fase，则不再执行success的后续操作
+        success: null,
         //在success后执行
         postSuccess: null,
         //在complete前执行，如果返回fase，则不再执行complete的后续操作
         preComplete: null,
+        //ajax完成后function，如果未指定，则执行模板中的complete函数，如果返回fase，则不再执行complete的后续操作
+        complete: null,
         //在complete后执行
         postComplete: null,
         //在error前执行，如果返回fase，则不再执行error的后续操作
         preError: null,
+        //ajax失败后function，如果未指定，则执行模板中的error函数，如果返回fase，则不再执行error的后续操作
+        error: null,
         //在error后执行
         postError: null
     };
