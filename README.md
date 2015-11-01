@@ -437,3 +437,4 @@ ops:当前插件选项
 
 # 事件调用流程图
 
+![](https://raw.githubusercontent.com/xucongli1989/XGoAjax/master/%E4%BA%8B%E4%BB%B6%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B.jpg)
