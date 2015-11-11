@@ -362,11 +362,17 @@ ops:当前插件选项
                     preBefore: function () {
                         console.log("preBefore");
                     },
+                    before: function () {
+                        console.log("before");
+                    },
                     postBefore: function () {
                         console.log("postBefore");
                     },
                     preSuccess: function () {
                         console.log("preSuccess");
+                    },
+                    success: function () {
+                        console.log("success");
                     },
                     postSuccess: function () {
                         console.log("postSuccess");
@@ -374,11 +380,17 @@ ops:当前插件选项
                     preComplete: function () {
                         console.log("preComplete");
                     },
+                    complete: function () {
+                        console.log("complete");
+                    },
                     postComplete: function () {
                         console.log("postComplete");
                     },
                     preError: function () {
                         console.log("preError");
+                    },
+                    error: function () {
+                        console.log("error");
                     },
                     postError: function () {
                         console.log("postError");
@@ -395,11 +407,17 @@ ops:当前插件选项
                         console.log("preBefore");
                         return false;
                     },
+                    before: function () {
+                        console.log("before");
+                    },
                     postBefore: function () {
                         console.log("postBefore");
                     },
                     preSuccess: function () {
                         console.log("preSuccess");
+                    },
+                    success: function () {
+                        console.log("success");
                     },
                     postSuccess: function () {
                         console.log("postSuccess");
@@ -407,11 +425,17 @@ ops:当前插件选项
                     preComplete: function () {
                         console.log("preComplete");
                     },
+                    complete: function () {
+                        console.log("complete");
+                    },
                     postComplete: function () {
                         console.log("postComplete");
                     },
                     preError: function () {
                         console.log("preError");
+                    },
+                    error: function () {
+                        console.log("error");
                     },
                     postError: function () {
                         console.log("postError");
