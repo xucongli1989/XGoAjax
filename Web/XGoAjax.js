@@ -12,13 +12,14 @@
  *                      a：ajax回调信息提示响应处理，比如提示成功或失败等消息。
  *                      b：提交按钮需要在ajax请求中阻止提交（防止多次提交）
  *                      c：同时发起多次ajax请求
- * 当前版本：v1.0.3
- * 更新时间：2015-10-30
+ * 当前版本：v1.0.4
+ * 更新时间：2016-01-16
+ * 更新内容：修复bug【自定义模板中的templateOption无效】
  */
 ; (function (win, doc, $, undefined) {
     "use strict";
 
-    var _version = "v1.0.3，https://github.com/xucongli1989/XGoAjax";
+    var _version = "v1.0.4，https://github.com/xucongli1989/XGoAjax";
 
     //全局设置
     var _globalSettings = {};
@@ -152,7 +153,7 @@
             });
         }
 
-        ops.templateOption = $.extend({}, ops.templateOption, tp.templateOption);
+        ops.templateOption = $.extend({}, tp.templateOption, ops.templateOption);
 
         //独占模式时，验证相关信息
         if (ops.isExclusive) {

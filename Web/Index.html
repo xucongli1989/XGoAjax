@@ -270,7 +270,10 @@
                     target: _this,
                     isExclusive: false,
                     id: "btnSaveWithEvent2",
-                    ajax: { url: "data.aspx" }
+                    ajax: { url: "data.aspx" },
+                    templateOption: {
+                        beforeSendMsg:"不要急，我正在执行中了..."
+                    }
                 });
             });
 
