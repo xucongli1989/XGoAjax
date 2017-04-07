@@ -41,7 +41,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Data.aspx" />
+    <Content Include="XGoAjax.min.js">
+      <DependentUpon>XGoAjax.js</DependentUpon>
+    </Content>
     <Content Include="XGoAjaxTemplate.js" />
+    <Content Include="XGoAjaxTemplate.min.js">
+      <DependentUpon>XGoAjaxTemplate.js</DependentUpon>
+    </Content>
+    <None Include="bundleconfig.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,0 +1,14 @@
+[
+  {
+    "outputFileName": "XGoAjax.min.js",
+    "inputFiles": [
+      "XGoAjax.js"
+    ]
+  },
+  {
+    "outputFileName": "XGoAjaxTemplate.min.js",
+    "inputFiles": [
+      "XGoAjaxTemplate.js"
+    ]
+  }
+]
