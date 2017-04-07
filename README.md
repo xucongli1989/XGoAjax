@@ -218,7 +218,7 @@ ops:当前插件选项
 </tr>
 <tr>
 <td>data</td>
-<td>第一个form序列化值（jquery的serialize()方法）</td>
+<td>默认form序列化值（jquery的serialize()方法）（默认form读取逻辑：在未指定data的情况下，先读取target同一容器中的form，若没有则取页面的第一个form）</td>
 <td>发送的数据</td>
 </tr>
 
